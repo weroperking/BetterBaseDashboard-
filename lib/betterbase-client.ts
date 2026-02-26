@@ -88,6 +88,10 @@ export class BetterBaseMetaClient {
     return this.request<ApiKeyInfo[]>("/keys")
   }
 
+  async getRealtimeStats() {
+    return this.request<RealtimeStats>("/realtime")
+  }
+
   async testConnection(): Promise<{ ok: boolean; error?: string }> {
     const result = await this.getProject()
     if (result.error) return { ok: false, error: result.error }
@@ -145,4 +149,10 @@ export interface ApiKeyInfo {
   keyPrefix: string
   createdAt: string
   lastUsedAt: string | null
+}
+
+export interface RealtimeStats {
+  connectedClients: number
+  totalSubscriptions: number
+  subscribedTables: string[]
 }
