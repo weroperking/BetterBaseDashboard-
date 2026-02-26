@@ -1,0 +1,16 @@
+{
+  "name": "BetterBaseDashboard",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "features": {
+    "ghcr.io/devcontainer-community/devcontainer-features/bun.sh:1": {
+      "version": "latest"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "oven.bun-vscode"
+      ]
+    }
+  }
+}
