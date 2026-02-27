@@ -88,10 +88,62 @@ export class BetterBaseMetaClient {
     return this.request<ApiKeyInfo[]>("/keys")
   }
 
+  async getRealtimeStats() {
+    return this.request<RealtimeStats>("/realtime")
+  }
+
   async testConnection(): Promise<{ ok: boolean; error?: string }> {
     const result = await this.getProject()
     if (result.error) return { ok: false, error: result.error }
     return { ok: true }
+  }
+
+  // ── Phase 10 — Provider ───────────────────────────────────────────────────────
+  async getProvider() {
+    return this.request<ProviderInfo>("/provider")
+  }
+
+  // ── Phase 11 — RLS ────────────────────────────────────────────────────────────
+  async getRlsPolicies() {
+    return this.request<RlsPolicy[]>("/rls/policies")
+  }
+
+  // ── Phase 12 — GraphQL ────────────────────────────────────────────────────────
+  async getGraphqlSchema() {
+    return this.request<GraphqlSchemaInfo>("/graphql/schema")
+  }
+
+  // ── Phase 13 — Webhooks ───────────────────────────────────────────────────────
+  async getWebhooks() {
+    return this.request<WebhookConfig[]>("/webhooks")
+  }
+  async createWebhook(data: { table: string; events: string[]; url: string; secret?: string; enabled?: boolean }) {
+    return this.request<WebhookConfig>("/webhooks", { method: "POST", body: JSON.stringify(data) })
+  }
+  async updateWebhook(id: string, data: Partial<WebhookConfig>) {
+    return this.request<{ updated: boolean }>(`/webhooks/${id}`, { method: "PUT", body: JSON.stringify(data) })
+  }
+  async deleteWebhook(id: string) {
+    return this.request<{ deleted: boolean }>(`/webhooks/${id}`, { method: "DELETE" })
+  }
+  async testWebhook(id: string) {
+    return this.request<WebhookTestResult>(`/webhooks/${id}/test`, { method: "POST" })
+  }
+
+  // ── Phase 14 — Storage ────────────────────────────────────────────────────────
+  async getStorageBuckets() {
+    return this.request<StorageBucket[]>("/storage/buckets")
+  }
+  async getStorageFiles(bucket: string, prefix = "") {
+    return this.request<StorageFile[]>(`/storage/${encodeURIComponent(bucket)}/files?prefix=${encodeURIComponent(prefix)}`)
+  }
+  async deleteStorageFile(bucket: string, key: string) {
+    return this.request<{ deleted: boolean; key: string }>(`/storage/${encodeURIComponent(bucket)}/files/${encodeURIComponent(key)}`, { method: "DELETE" })
+  }
+
+  // ── Phase 15 — Edge Functions ─────────────────────────────────────────────────
+  async getEdgeFunctions() {
+    return this.request<EdgeFunction[]>("/functions")
   }
 }
 
@@ -145,4 +197,10 @@ export interface ApiKeyInfo {
   keyPrefix: string
   createdAt: string
   lastUsedAt: string | null
+}
+
+export interface RealtimeStats {
+  connectedClients: number
+  totalSubscriptions: number
+  subscribedTables: string[]
 }

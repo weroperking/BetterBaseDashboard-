@@ -2,6 +2,13 @@ import { useEffect, useState } from "react"
 import { useConnectionStore } from "@/lib/store"
 import { BetterBaseMetaClient, ProjectInfo } from "@/lib/betterbase-client"
 
+export function useMetaClient() {
+  const { getActive } = useConnectionStore()
+  const connection = getActive()
+  if (!connection) return null
+  return new BetterBaseMetaClient(connection)
+}
+
 export function useProject() {
   const { getActive } = useConnectionStore()
   const [project, setProject] = useState<ProjectInfo | null>(null)
