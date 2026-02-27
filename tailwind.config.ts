@@ -9,8 +9,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      /* ============================================
+         SUPABASE DESIGN TOKENS
+         ============================================ */
+      
+      /* Supabase Colors - Dark Mode */
       colors: {
-        /* Supabase Design System Colors */
+        /* Existing color definitions */
         background: "var(--background)",
         foreground: {
           DEFAULT: "var(--foreground)",
@@ -103,11 +108,47 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        
+        /* ============================================
+           NEW SUPABASE DESIGN TOKENS
+           ============================================ */
+        
+        /* Supabase Backgrounds */
+        "bg-primary": "var(--bg-primary)",
+        "bg-secondary": "var(--bg-secondary)",
+        "bg-tertiary": "var(--bg-tertiary)",
+        "bg-input": "var(--bg-input)",
+        
+        /* Supabase Borders */
+        "border-default": "var(--border-default)",
+        "border-subtle": "var(--border-subtle)",
+        
+        /* Supabase Text Colors */
+        "text-primary": "var(--text-primary)",
+        "text-secondary": "var(--text-secondary)",
+        "text-muted": "var(--text-muted)",
+        
+        /* Supabase Accent (Green) */
+        "accent-green": "var(--accent-green)",
+        "accent-green-hover": "var(--accent-green-hover)",
+        "accent-green-muted": "var(--accent-green-muted)",
+        
+        /* Supabase Status Colors */
+        danger: "var(--status-danger)",
+        status: {
+          danger: "var(--status-danger)",
+          warning: "var(--status-warning)",
+          info: "var(--status-info)",
+        },
+        info: "var(--status-info)",
       },
+      
+      /* ============================================
+         TYPOGRAPHY
+         ============================================ */
       fontFamily: {
         sans: [
-          "var(--font-circular)",
-          "var(--font-inter)",
+          "Inter",
           "system-ui",
           "-apple-system",
           "BlinkMacSystemFont",
@@ -118,7 +159,7 @@ const config: Config = {
           "sans-serif",
         ],
         mono: [
-          "var(--font-source-code-pro)",
+          "JetBrains Mono",
           "ui-monospace",
           "SFMono-Regular",
           "Menlo",
@@ -129,11 +170,69 @@ const config: Config = {
           "monospace",
         ],
       },
+      
+      fontSize: {
+        /* Supabase Typography Scale */
+        'h1': ['24px', { lineHeight: '32px', fontWeight: '600' }],
+        'h2': ['20px', { lineHeight: '28px', fontWeight: '600' }],
+        'h3': ['16px', { lineHeight: '24px', fontWeight: '600' }],
+        'body': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+        'small': ['12px', { lineHeight: '16px', fontWeight: '400' }],
+        'table-header': ['11px', { lineHeight: '16px', fontWeight: '500' }],
+        'code': ['13px', { lineHeight: '20px', fontWeight: '400' }],
+      },
+      
+      /* ============================================
+         SPACING (4px Base Unit)
+         ============================================ */
+      spacing: {
+        '1': '4px',
+        '2': '8px',
+        '3': '12px',
+        '4': '16px',
+        '5': '20px',
+        '6': '24px',
+        '8': '32px',
+        '12': '48px',
+      },
+      
+      /* ============================================
+         LAYOUT DIMENSIONS
+         ============================================ */
+      width: {
+        'sidebar': '280px',
+        'sidebar-collapsed': '64px',
+      },
+      height: {
+        'header': '56px',
+        'button': '36px',
+        'input': '36px',
+        'tab': '36px',
+        'sidebar-item': '40px',
+        'table-header': '40px',
+        'table-row': '44px',
+        'badge': '22px',
+      },
+      maxWidth: {
+        'content': '1400px',
+      },
+      
+      /* ============================================
+         BORDER RADIUS
+         ============================================ */
       borderRadius: {
+        'card': '8px',
+        'button': '6px',
+        'input': '6px',
+        'badge': '4px',
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      
+      /* ============================================
+         KEYFRAME ANIMATIONS
+         ============================================ */
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -168,6 +267,10 @@ const config: Config = {
           to: { transform: "rotate(360deg)" },
         },
       },
+      
+      /* ============================================
+         ANIMATIONS
+         ============================================ */
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
@@ -178,6 +281,10 @@ const config: Config = {
         "slide-in-from-left": "slide-in-from-left 0.3s ease-out",
         "spin-slow": "spin-slow 1s linear infinite",
       },
+      
+      /* ============================================
+         TRANSITION TIMING FUNCTIONS
+         ============================================ */
       transitionTimingFunction: {
         "ease-in-out-cubic": "cubic-bezier(0.65, 0, 0.35, 1)",
         "ease-out-cubic": "cubic-bezier(0.33, 1, 0.68, 1)",
@@ -187,4 +294,5 @@ const config: Config = {
   },
   plugins: [],
 };
+
 export default config;

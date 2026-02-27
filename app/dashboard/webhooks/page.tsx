@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Webhook, Plus, Trash2, Play, Power, Check, X } from "lucide-react"
+import { Webhook, Plus, Trash2, Play, Power, Check, X, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const DB_EVENTS = ["INSERT", "UPDATE", "DELETE"] as const
@@ -82,7 +82,7 @@ export default function WebhooksPage() {
 
       {/* Create form */}
       {showCreate && (
-        <Card className="bg-surface-100 mb-6">
+        <Card className="mb-4">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center justify-between text-base font-medium">
               <span>New webhook</span>
@@ -99,7 +99,7 @@ export default function WebhooksPage() {
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="table">Table <span className="text-destructive">*</span></Label>
+                  <Label htmlFor="table">Table <span className="text-[#ef4444]">*</span></Label>
                   <Input
                     id="table"
                     placeholder="posts"
@@ -110,7 +110,7 @@ export default function WebhooksPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="url">Endpoint URL <span className="text-destructive">*</span></Label>
+                  <Label htmlFor="url">Endpoint URL <span className="text-[#ef4444]">*</span></Label>
                   <Input
                     id="url"
                     type="url"
@@ -123,14 +123,14 @@ export default function WebhooksPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Events <span className="text-destructive">*</span></Label>
+                <Label>Events <span className="text-[#ef4444]">*</span></Label>
                 <div className="flex gap-2">
                   {DB_EVENTS.map(event => (
                     <Button
                       key={event}
                       type="button"
                       size="sm"
-                      variant={form.events.includes(event) ? "primary" : "default"}
+                      variant={form.events.includes(event) ? "primary" : "secondary"}
                       onClick={() => toggleEvent(event)}
                       className="font-mono"
                     >
@@ -143,7 +143,7 @@ export default function WebhooksPage() {
               <div className="space-y-2">
                 <Label htmlFor="secret">
                   Signing secret{" "}
-                  <span className="text-foreground-light font-normal">(optional)</span>
+                  <span className="text-[#a0a0a0] font-normal">(optional)</span>
                 </Label>
                 <Input
                   id="secret"
@@ -165,7 +165,7 @@ export default function WebhooksPage() {
                 </Button>
                 <Button
                   type="button"
-                  variant="default"
+                  variant="secondary"
                   onClick={() => setShowCreate(false)}
                 >
                   Cancel
@@ -180,16 +180,22 @@ export default function WebhooksPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2].map(i => (
-            <div key={i} className="h-24 rounded-lg border border-border bg-surface-100 animate-pulse" />
+            <div key={i} className="h-24 rounded-lg border border-[#404040] bg-[#222222] animate-pulse" />
           ))}
         </div>
       ) : !webhooks || webhooks.length === 0 ? (
         <Card className="p-12 text-center">
-          <Webhook className="h-12 w-12 text-foreground-muted mx-auto mb-4" />
-          <p className="text-sm font-medium text-foreground">No webhooks configured</p>
-          <p className="text-xs text-foreground-light mt-1">
-            Create a webhook to receive HTTP notifications when your data changes
-          </p>
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-[#2d2d2d] flex items-center justify-center">
+              <Webhook className="h-8 w-8 text-[#666666]" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-white">No webhooks configured</p>
+              <p className="text-sm text-[#a0a0a0] mt-1">
+                Create a webhook to receive HTTP notifications when your data changes
+              </p>
+            </div>
+          </div>
         </Card>
       ) : (
         <div className="space-y-4">
@@ -206,12 +212,12 @@ export default function WebhooksPage() {
             const testResult = testResults[webhook.id]
 
             return (
-              <Card key={webhook.id} className="bg-surface-100">
+              <Card key={webhook.id}>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0 space-y-1.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <code className="text-sm font-semibold font-mono text-foreground">
+                        <code className="text-sm font-semibold font-mono text-white">
                           {webhook.table}
                         </code>
                         {events.map(ev => (
@@ -219,15 +225,15 @@ export default function WebhooksPage() {
                             {ev}
                           </Badge>
                         ))}
-                        <Badge variant={webhook.enabled ? "brand" : "secondary"}>
+                        <Badge variant={webhook.enabled ? "success" : "secondary"}>
                           {webhook.enabled ? "Enabled" : "Disabled"}
                         </Badge>
                       </div>
-                      <p className="text-xs font-mono text-foreground-light truncate">
+                      <p className="text-xs font-mono text-[#a0a0a0] truncate">
                         → {webhook.url}
                       </p>
                       {webhook.secret && (
-                        <p className="text-xs text-foreground-light">
+                        <p className="text-xs text-[#666666]">
                           Signed with HMAC SHA-256
                         </p>
                       )}
@@ -254,6 +260,13 @@ export default function WebhooksPage() {
                       >
                         <Power className="h-3.5 w-3.5" />
                       </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        title="Settings"
+                      >
+                        <Settings className="h-3.5 w-3.5" />
+                      </Button>
                       {deleteId === webhook.id ? (
                         <div className="flex items-center gap-1">
                           <Button
@@ -268,7 +281,7 @@ export default function WebhooksPage() {
                           </Button>
                           <Button
                             size="sm"
-                            variant="default"
+                            variant="secondary"
                             onClick={() => setDeleteId(null)}
                           >
                             Cancel
@@ -291,8 +304,8 @@ export default function WebhooksPage() {
                     <div className={cn(
                       "flex items-center gap-2 px-3 py-2 rounded text-xs",
                       testResult.ok
-                        ? "bg-brand/10 text-brand border border-brand/20"
-                        : "bg-destructive/10 text-destructive border border-destructive/20"
+                        ? "bg-[rgba(36,180,126,0.1)] text-[#24b47e] border border-[rgba(36,180,126,0.2)]"
+                        : "bg-[rgba(239,68,68,0.1)] text-[#ef4444] border border-[rgba(239,68,68,0.2)]"
                     )}>
                       {testResult.ok
                         ? <Check className="h-3.5 w-3.5 flex-shrink-0" />

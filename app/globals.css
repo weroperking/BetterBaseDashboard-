@@ -63,6 +63,63 @@
     --colors-scale11: #525252;
     --colors-scale12: #171717;
     
+    /* Supabase Dark Mode Backgrounds */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #222222;
+    --bg-input: #2d2d2d;
+    
+    /* Supabase Dark Mode Borders */
+    --border-default: #404040;
+    --border-subtle: #333333;
+    
+    /* Supabase Dark Mode Text */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+    
+    /* Supabase Accent (Green) - Exact Supabase Brand Color */
+    --accent-green: #3ecf8e;
+    --accent-green-hover: #2db97a;
+    --accent-green-muted: rgba(62, 207, 142, 0.2);
+    
+    /* Supabase Status Colors */
+    --status-danger: #f87171;
+    --status-warning: #f59e0b;
+    --status-info: #3b82f6;
+    
+    /* Supabase Spacing (4px Base Unit) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    
+    /* Supabase Layout Dimensions */
+    --sidebar-width: 280px;
+    --sidebar-collapsed: 64px;
+    --header-height: 56px;
+    --content-max-width: 1400px;
+    --content-padding: 24px;
+    
+    /* Supabase Border Radius */
+    --radius-card: 8px;
+    --radius-button: 6px;
+    --radius-input: 6px;
+    --radius-badge: 4px;
+    
+    /* Supabase Component Heights */
+    --height-button: 36px;
+    --height-input: 36px;
+    --height-tab: 36px;
+    --height-sidebar-item: 40px;
+    --height-table-header: 40px;
+    --height-table-row: 44px;
+    --height-badge: 22px;
+    
     /* Legacy shadcn/ui compatibility (HSL format) */
     --background-hsl: 0 0% 99%;
     --foreground-hsl: 0 0% 9%;
@@ -103,6 +160,31 @@
 
   [data-theme="dark"] {
     /* Supabase Design System - Dark Theme */
+    
+    /* Supabase Dark Mode Backgrounds - Exact from Design System */
+    --bg-primary: #1c1c1c;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #1f1f1f;
+    --bg-input: #1a1a1a;
+    
+    /* Supabase Dark Mode Borders - Exact from Design System */
+    --border-default: #2e2e2e;
+    --border-subtle: #333333;
+    
+    /* Supabase Dark Mode Text - Exact from Design System */
+    --text-primary: #ededed;
+    --text-secondary: #a0a0a0;
+    --text-muted: #555555;
+    
+    /* Supabase Accent (Green) - Exact Supabase Brand Color */
+    --accent-green: #3ecf8e;
+    --accent-green-hover: #2db97a;
+    --accent-green-muted: rgba(62, 207, 142, 0.2);
+    
+    /* Supabase Status Colors - Exact from Design System */
+    --status-danger: #f87171;
+    --status-warning: #f59e0b;
+    --status-info: #3b82f6;
     
     /* Foreground Colors */
     --foreground: #f8f8f8;

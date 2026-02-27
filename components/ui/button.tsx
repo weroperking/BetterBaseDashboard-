@@ -4,27 +4,42 @@ import { Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-[6px] text-sm font-medium transition-all duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(36,180,126,0.2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1a1a] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-surface-200 text-foreground hover:bg-surface-300 border border-border",
-        primary: "bg-brand text-black hover:bg-brand-500 border-0",
-        destructive: "bg-destructive text-white hover:bg-destructive-500 border-0",
-        outline: "border border-border bg-transparent hover:bg-surface-200 hover:text-foreground",
-        ghost: "hover:bg-surface-200 hover:text-foreground",
-        link: "text-brand underline-offset-4 hover:underline",
-        warning: "bg-warning text-white hover:bg-warning-500 border-0",
+        // Primary: bg-accent-green, white text, no border
+        primary: "bg-accent-green text-black hover:bg-accent-green-hover border-0",
+        // Secondary: transparent bg, 1px border-default, white text
+        secondary: "bg-transparent text-white border border-[#404040] hover:bg-[#2d2d2d] hover:border-[#505050]",
+        // Ghost: transparent bg, no border, muted text
+        ghost: "bg-transparent text-[#666666] border-0 hover:bg-[#2d2d2d] hover:text-[#a0a0a0]",
+        // Danger: bg-danger, white text
+        danger: "bg-status-danger text-white hover:bg-[#f87171] border-0",
+        // Default maps to primary
+        default: "bg-accent-green text-black hover:bg-accent-green-hover border-0",
+        // Destructive alias for danger
+        destructive: "bg-status-danger text-white hover:bg-[#f87171] border-0",
+        // Outline maps to secondary
+        outline: "bg-transparent text-white border border-[#404040] hover:bg-[#2d2d2d] hover:border-[#505050]",
+        // Link maps to ghost
+        link: "bg-transparent text-accent-green border-0 underline-offset-4 hover:underline",
+        // Warning variant
+        warning: "bg-status-warning text-black hover:bg-[#fcd34d] border-0",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        // Default: 36px height, 0 16px padding
+        default: "h-[36px] px-4",
+        // Small: 32px height
+        sm: "h-8 px-3 text-xs",
+        // Large: 40px height
+        lg: "h-10 px-6",
+        // Icon: 36px x 36px
+        icon: "h-9 w-9",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
     },
   }

@@ -20,17 +20,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!connection) return null
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      {/* Fixed Sidebar */}
+    <div className="flex h-screen bg-[#1a1a1a] overflow-hidden">
+      {/* Fixed Sidebar - 280px width, bg-secondary */}
       <Sidebar />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        {/* Top Header Bar */}
+        {/* Top Header Bar - 56px height */}
         <DashboardHeader />
 
         {/* Page Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main className="flex-1 overflow-y-auto bg-[#1a1a1a]">
           {children}
         </main>
       </div>

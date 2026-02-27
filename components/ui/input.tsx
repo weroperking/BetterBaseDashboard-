@@ -10,7 +10,24 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          "flex h-10 w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-sm text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:border-border-strong disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
+          // Height: 36px
+          "h-[36px] w-full rounded-[6px]",
+          // Background: bg-input
+          "bg-bg-input",
+          // Border: 1px solid border-default
+          "border border-border-default",
+          // Padding: 0 12px
+          "px-3 py-0",
+          // Text: text-primary
+          "text-sm text-text-primary",
+          // Placeholder: text-muted
+          "placeholder:text-text-muted",
+          // Focus: border-accent-green, focus ring
+          "focus:outline-none focus:border-accent-green focus:ring-2 focus:ring-accent-green-muted focus:ring-offset-2 focus:ring-offset-bg-primary",
+          // Disabled states
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          // Transition
+          "transition-colors duration-150 ease-in-out",
           className
         )}
         ref={ref}
@@ -29,7 +46,24 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <textarea
         className={cn(
-          "flex min-h-[80px] w-full rounded-md border border-border bg-surface-100 px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-foreground-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:border-border-strong disabled:cursor-not-allowed disabled:opacity-50 transition-colors resize-y",
+          // Min height: 80px
+          "flex min-h-[80px] w-full rounded-[6px]",
+          // Background: bg-input
+          "bg-bg-input",
+          // Border: 1px solid border-default
+          "border border-border-default",
+          // Padding: 12px
+          "px-3 py-2",
+          // Text: text-primary
+          "text-sm text-text-primary",
+          // Placeholder: text-muted
+          "placeholder:text-text-muted",
+          // Focus: border-accent-green, focus ring
+          "focus:outline-none focus:border-accent-green focus:ring-2 focus:ring-accent-green-muted focus:ring-offset-2 focus:ring-offset-bg-primary",
+          // Disabled states
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          // Transition
+          "transition-colors duration-150 ease-in-out resize-y",
           className
         )}
         ref={ref}

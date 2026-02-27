@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { useConnectionStore } from "@/lib/store"
 import { useMetaClient } from "@/hooks/use-project"
-import { PageContainer, PageHeader, PageSection } from "@/components/layout/page-container"
-import { Card, CardContent } from "@/components/ui/card"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ExternalLink, Trash2, Database } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { ExternalLink, Trash2, Database, Key, Settings as SettingsIcon, Copy, Check, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
@@ -17,6 +18,7 @@ export default function SettingsPage() {
   const connection = getActive()
   const client = useMetaClient()
   const [confirmDisconnect, setConfirmDisconnect] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const { data: project } = useQuery({
     queryKey: ["project"],
@@ -46,6 +48,12 @@ export default function SettingsPage() {
     router.replace("/connect")
   }
 
+  function copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <PageContainer size="constrained">
       <PageHeader 
@@ -54,82 +62,137 @@ export default function SettingsPage() {
       />
 
       {/* Project info */}
-      <Card className="bg-surface-100">
-        <CardContent className="p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-foreground">Project</h2>
-          <div className="divide-y divide-border">
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <SettingsIcon className="h-4 w-4 text-[#a0a0a0]" />
+            Project
+          </CardTitle>
+          <CardDescription>Your project connection details</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="divide-y divide-[#333333]">
             <SettingsRow label="Project name" value={project?.name ?? connection?.name ?? "—"} />
             <SettingsRow label="Project ID" value={project?.id ?? "—"} mono />
             <SettingsRow
               label="Created"
               value={project?.createdAt ? new Date(project.createdAt).toLocaleDateString() : "—"}
             />
-            <SettingsRow label="Project URL" value={connection?.url ?? "—"} mono />
+            <SettingsRow 
+              label="Project URL" 
+              value={connection?.url ?? "—"} 
+              mono 
+              action={
+                connection?.url && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7"
+                    onClick={() => copyToClipboard(connection.url!)}
+                  >
+                    {copied ? <Check className="h-3.5 w-3.5 text-[#24b47e]" /> : <Copy className="h-3.5 w-3.5" />}
+                  </Button>
+                )
+              }
+            />
           </div>
-          <Button
-            variant="link"
-            size="sm"
-            className="h-auto p-0"
-            icon={<ExternalLink className="h-3 w-3" />}
-            asChild
-          >
-            <a href={`${connection?.url}/health`} target="_blank" rel="noopener noreferrer">
-              Open health endpoint
-            </a>
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Database provider */}
-      <Card className="bg-surface-100">
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center gap-2">
-            <Database className="h-4 w-4 text-foreground-muted" />
-            <h2 className="text-sm font-semibold text-foreground">Database Provider</h2>
-          </div>
-
-          {!provider ? (
-            <div className="h-10 rounded bg-surface-200 animate-pulse" />
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <ProviderBadge provider={provider.provider} />
-                <div>
-                  <p className="text-sm font-medium text-foreground">{provider.label}</p>
-                  <p className="text-xs text-foreground-light">Dialect: {provider.dialect}</p>
-                </div>
-              </div>
-
-              <div className="divide-y divide-border">
-                <SettingsRow label="Provider" value={provider.provider} mono />
-                <SettingsRow label="SQL dialect" value={provider.dialect} mono />
-                <SettingsRow
-                  label="Row-Level Security"
-                  value={provider.supportsRls ? "Supported" : "Not supported (SQLite/MySQL only)"}
-                />
-              </div>
-
-              {!provider.supportsRls && (
-                <div className="rounded-md bg-warning/10 border border-warning/20 px-3 py-2">
-                  <p className="text-xs text-warning">
-                    RLS is only available with Postgres providers (Neon, Supabase, raw Postgres).
-                    Switch your provider in <code className="font-mono">betterbase.config.ts</code> to enable it.
-                  </p>
-                </div>
-              )}
-            </div>
+          {connection?.url && (
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<ExternalLink className="h-4 w-4" />}
+              className="w-full"
+              asChild
+            >
+              <a href={`${connection.url}/health`} target="_blank" rel="noopener noreferrer">
+                Open health endpoint
+              </a>
+            </Button>
           )}
         </CardContent>
       </Card>
 
+      {/* Database provider */}
+      <Card className="mb-4">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Database className="h-4 w-4 text-[#a0a0a0]" />
+            <CardTitle className="text-base font-medium">Database Provider</CardTitle>
+          </div>
+          <CardDescription>Your database configuration</CardDescription>
+        </CardHeader>
+
+        {!provider ? (
+          <CardContent>
+            <div className="h-10 rounded bg-[#2d2d2d] animate-pulse" />
+          </CardContent>
+        ) : (
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <ProviderBadge provider={provider.provider} />
+              <div>
+                <p className="text-sm font-medium text-white">{provider.label}</p>
+                <p className="text-xs text-[#a0a0a0]">Dialect: {provider.dialect}</p>
+              </div>
+            </div>
+
+            <div className="divide-y divide-[#333333]">
+              <SettingsRow label="Provider" value={provider.provider} mono />
+              <SettingsRow label="SQL dialect" value={provider.dialect} mono />
+              <SettingsRow
+                label="Row-Level Security"
+                value={provider.supportsRls ? "Supported" : "Not supported (SQLite/MySQL only)"}
+              />
+            </div>
+
+            {!provider.supportsRls && (
+              <div className="rounded-md bg-[rgba(251,191,36,0.1)] border border-[rgba(251,191,36,0.2)] px-3 py-2">
+                <p className="text-xs text-[#fbbf24]">
+                  RLS is only available with Postgres providers (Neon, Supabase, raw Postgres).
+                  Switch your provider in <code className="font-mono bg-[#2d2d2d] px-1 rounded">betterbase.config.ts</code> to enable it.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        )}
+      </Card>
+
+      {/* API Keys */}
+      <Card className="mb-4">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Key className="h-4 w-4 text-[#a0a0a0]" />
+            <CardTitle className="text-base font-medium">API Keys</CardTitle>
+          </div>
+          <CardDescription>Keys used for API authentication</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="divide-y divide-[#333333]">
+            <SettingsRow label="Service Role Key" value={connection?.serviceRoleKey ? "••••••••••••••••" : "—"} mono />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<RefreshCw className="h-4 w-4" />}
+            >
+              Rotate Keys
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Danger zone */}
-      <Card className="border-destructive/30 bg-surface-100">
-        <CardContent className="p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-destructive">Danger Zone</h2>
+      <Card className="border-[rgba(239,68,68,0.3)]">
+        <CardHeader>
+          <CardTitle className="text-base font-medium text-[#ef4444]">Danger Zone</CardTitle>
+          <CardDescription>Irreversible actions that affect your connection</CardDescription>
+        </CardHeader>
+        <CardContent>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-foreground">Disconnect project</p>
-              <p className="text-xs text-foreground-light mt-0.5">
+              <p className="text-sm font-medium text-white">Disconnect project</p>
+              <p className="text-xs text-[#a0a0a0] mt-0.5">
                 Removes this connection from the dashboard. Your backend data is not affected.
               </p>
             </div>
@@ -144,7 +207,7 @@ export default function SettingsPage() {
                 </Button>
                 <Button
                   size="sm"
-                  variant="default"
+                  variant="secondary"
                   onClick={() => setConfirmDisconnect(false)}
                 >
                   Cancel
@@ -154,7 +217,7 @@ export default function SettingsPage() {
               <Button
                 size="sm"
                 variant="outline"
-                className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                className="border-[rgba(239,68,68,0.3)] text-[#ef4444] hover:bg-[rgba(239,68,68,0.1)]"
                 icon={<Trash2 className="h-3 w-3" />}
                 onClick={() => setConfirmDisconnect(true)}
               >
@@ -170,34 +233,37 @@ export default function SettingsPage() {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function SettingsRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+function SettingsRow({ label, value, mono, action }: { label: string; value: string; mono?: boolean; action?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-6 py-2.5 first:pt-0 last:pb-0">
-      <span className="text-xs text-foreground-light flex-shrink-0">{label}</span>
-      <span className={cn(
-        "text-xs text-foreground text-right break-all",
-        mono && "font-mono"
-      )}>
-        {value}
-      </span>
+      <span className="text-xs text-[#a0a0a0] flex-shrink-0">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className={cn(
+          "text-xs text-white text-right break-all",
+          mono && "font-mono"
+        )}>
+          {value}
+        </span>
+        {action}
+      </div>
     </div>
   )
 }
 
 const PROVIDER_STYLES: Record<string, string> = {
-  local:       "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-  neon:        "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
-  turso:       "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
-  supabase:    "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
-  postgres:    "bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20",
-  planetscale: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
+  local:       "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  neon:        "bg-green-500/10 text-green-400 border-green-500/20",
+  turso:       "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  supabase:    "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  postgres:    "bg-sky-500/10 text-sky-400 border-sky-500/20",
+  planetscale: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
 }
 
 function ProviderBadge({ provider }: { provider: string }) {
   return (
     <span className={cn(
       "px-3 py-1.5 rounded-full text-xs font-semibold border uppercase tracking-wide",
-      PROVIDER_STYLES[provider] ?? "bg-surface-200 text-foreground border-border"
+      PROVIDER_STYLES[provider] ?? "bg-[#2d2d2d] text-white border-[#404040]"
     )}>
       {provider}
     </span>
