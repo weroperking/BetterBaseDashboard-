@@ -204,3 +204,87 @@ export interface RealtimeStats {
   totalSubscriptions: number
   subscribedTables: string[]
 }
+
+export interface ProviderInfo {
+  name: string
+  enabled: boolean
+  config: Record<string, unknown>
+  supportsRls?: boolean
+  provider: string
+  dialect: string
+  label: string
+}
+
+export interface RlsPolicy {
+  id: string
+  tableName: string
+  name: string
+  definition: string
+  enabled: boolean
+  table?: string
+  fileName?: string
+  select?: boolean | string
+  insert?: boolean | string
+  update?: boolean | string
+  delete?: boolean | string
+}
+
+export interface GraphqlSchemaInfo {
+  types: string[]
+  queries: string[]
+  mutations: string[]
+  endpoint?: string
+  schema?: string
+}
+
+export interface WebhookConfig {
+  id: string
+  table: string
+  events: string[]
+  url: string
+  secret?: string
+  enabled: boolean
+  createdAt: string
+}
+
+export interface WebhookTestResult {
+  success: boolean
+  ok: boolean
+  status: number
+  statusCode?: number
+  response?: string
+  error?: string
+}
+
+export interface StorageBucket {
+  id: string
+  name: string
+  public: boolean
+  createdAt: string
+  provider?: string
+  region?: string
+  endpoint?: string
+}
+
+export interface StorageFile {
+  key: string
+  size: number
+  contentType: string
+  createdAt: string
+  lastModified: string
+}
+
+export interface EdgeFunction {
+  id: string
+  name: string
+  slug: string
+  status: "active" | "inactive"
+  createdAt: string
+  updatedAt: string
+  runtime: string
+  hasIndex: boolean
+  built: boolean
+  deployUrl?: string
+  buildCommand?: string
+  deployCommand?: string
+}

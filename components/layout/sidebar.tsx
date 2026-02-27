@@ -3,29 +3,30 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import {
-  LayoutDashboard,
   Database,
   Users,
   FileText,
   Key,
   Settings,
-  ChevronLeft,
   LogOut,
   Shield,
   Code2,
   Webhook,
   HardDrive,
   Cpu,
+  Zap,
+  Activity,
+  ChevronDown,
+  Menu,
+  X,
 } from "lucide-react"
 import { useConnectionStore } from "@/lib/store"
+import { useState } from "react"
 
-const sidebarItems = [
-  {
-    title: "Overview",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
+// Main navigation items - following Supabase dashboard structure
+const mainNavItems = [
   {
     title: "Tables",
     href: "/dashboard/tables",
@@ -37,106 +38,187 @@ const sidebarItems = [
     icon: Users,
   },
   {
+    title: "Storage",
+    href: "/dashboard/storage",
+    icon: HardDrive,
+  },
+  {
+    title: "Functions",
+    href: "/dashboard/functions",
+    icon: Cpu,
+  },
+  {
+    title: "Webhooks",
+    href: "/dashboard/webhooks",
+    icon: Webhook,
+  },
+  {
     title: "Logs",
     href: "/dashboard/logs",
     icon: FileText,
+  },
+  {
+    title: "Realtime",
+    href: "/dashboard/realtime",
+    icon: Zap,
+  },
+  {
+    title: "GraphQL",
+    href: "/dashboard/graphql",
+    icon: Code2,
   },
   {
     title: "API",
     href: "/dashboard/api",
     icon: Key,
   },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
-  },
 ]
 
-const platformNav = [
-  { name: "RLS Policies",   href: "/dashboard/rls",       icon: Shield },
-  { name: "GraphQL",        href: "/dashboard/graphql",   icon: Code2 },
-  { name: "Webhooks",       href: "/dashboard/webhooks",  icon: Webhook },
-  { name: "Storage",        href: "/dashboard/storage",   icon: HardDrive },
-  { name: "Edge Functions", href: "/dashboard/functions", icon: Cpu },
-]
+// Settings nav item (separate for bottom placement)
+const settingsNavItem = {
+  title: "Settings",
+  href: "/dashboard/settings",
+  icon: Settings,
+}
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { getActive, setActive } = useConnectionStore()
+  const { getActive } = useConnectionStore()
   const activeConnection = getActive()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Check if a nav item is active
+  const isActive = (href: string) => {
+    if (href === "/dashboard") {
+      return pathname === "/dashboard"
+    }
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
 
   return (
-    <div className="flex h-screen w-64 flex-col border-r bg-card">
-      <div className="flex h-14 items-center border-b px-4">
-        <span className="font-semibold text-lg">BetterBase</span>
-      </div>
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="lg:hidden fixed top-3 left-3 z-50 p-2 rounded-md bg-surface-200 hover:bg-surface-300 transition-colors"
+        aria-label="Toggle menu"
+      >
+        {mobileMenuOpen ? (
+          <X className="h-5 w-5 text-foreground" />
+        ) : (
+          <Menu className="h-5 w-5 text-foreground" />
+        )}
+      </button>
 
-      {activeConnection && (
-        <div className="border-b p-3">
-          <div className="rounded-md bg-muted p-2">
-            <p className="text-sm font-medium truncate">{activeConnection.name}</p>
-            <p className="text-xs text-muted-foreground truncate">
-              {activeConnection.url}
-            </p>
-          </div>
-        </div>
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
       )}
 
-      <nav className="flex-1 space-y-1 p-2">
-        {sidebarItems.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              {item.title}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Platform nav */}
-      <div className="px-3 pb-2">
-        <p className="text-xs font-medium text-muted-foreground px-3 mb-2 uppercase tracking-wider">
-          Platform
-        </p>
-        <div className="space-y-0.5">
-          {platformNav.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors",
-                pathname === item.href || pathname.startsWith(item.href)
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              <item.icon className="h-4 w-4 flex-shrink-0" />
-              {item.name}
-            </Link>
-          ))}
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed lg:static inset-y-0 left-0 z-40",
+          "flex h-screen w-64 flex-col",
+          "bg-surface-100 border-r border-border",
+          "transition-transform duration-200 ease-in-out",
+          "lg:translate-x-0",
+          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Logo Section */}
+        <div className="flex h-14 items-center border-b border-border px-4">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-brand">
+              <Database className="h-5 w-5 text-black" />
+            </div>
+            <span className="font-semibold text-lg text-foreground">BetterBase</span>
+          </Link>
         </div>
-      </div>
 
-      <div className="border-t p-2">
-        <Link
-          href="/connect"
-          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <LogOut className="h-4 w-4" />
-          Switch Project
-        </Link>
-      </div>
-    </div>
+        {/* Project Switcher */}
+        {activeConnection && (
+          <div className="border-b border-border p-3">
+            <button className="w-full flex items-center justify-between rounded-md bg-surface-200 hover:bg-surface-300 px-3 py-2 transition-colors">
+              <div className="flex flex-col items-start min-w-0">
+                <span className="text-sm font-medium text-foreground truncate w-full">
+                  {activeConnection.name}
+                </span>
+                <span className="text-xs text-foreground-light truncate w-full">
+                  {activeConnection.url}
+                </span>
+              </div>
+              <ChevronDown className="h-4 w-4 text-foreground-light flex-shrink-0 ml-2" />
+            </button>
+          </div>
+        )}
+
+        {/* Main Navigation */}
+        <nav className="flex-1 overflow-y-auto py-3 px-3">
+          <div className="space-y-0.5">
+            {mainNavItems.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-brand-200 text-foreground"
+                      : "text-foreground-light hover:bg-surface-200 hover:text-foreground"
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      "h-4 w-4 flex-shrink-0",
+                      active ? "text-brand-600" : "text-foreground-muted"
+                    )}
+                  />
+                  <span className="truncate">{item.title}</span>
+                </Link>
+              )
+            })}
+          </div>
+        </nav>
+
+        {/* Bottom Section - Settings and Project Switch */}
+        <div className="border-t border-border p-3 space-y-1">
+          {/* Settings Nav Item */}
+          <Link
+            href={settingsNavItem.href}
+            onClick={() => setMobileMenuOpen(false)}
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              isActive(settingsNavItem.href)
+                ? "bg-brand-200 text-foreground"
+                : "text-foreground-light hover:bg-surface-200 hover:text-foreground"
+            )}
+          >
+            <settingsNavItem.icon
+              className={cn(
+                "h-4 w-4 flex-shrink-0",
+                isActive(settingsNavItem.href) ? "text-brand-600" : "text-foreground-muted"
+              )}
+            />
+            <span>{settingsNavItem.title}</span>
+          </Link>
+
+          {/* Switch Project Link */}
+          <Link
+            href="/connect"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground"
+          >
+            <LogOut className="h-4 w-4 text-foreground-muted flex-shrink-0" />
+            <span>Switch Project</span>
+          </Link>
+        </div>
+      </aside>
+    </>
   )
 }

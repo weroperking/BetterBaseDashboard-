@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react"
 import { useConnectionStore } from "@/lib/store"
 import { BetterBaseMetaClient, ApiKeyInfo } from "@/lib/betterbase-client"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Key } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Key, RefreshCw } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function ApiPage() {
   const { getActive } = useConnectionStore()
@@ -35,31 +38,66 @@ export default function ApiPage() {
     fetchKeys()
   }, [getActive])
 
+  const refreshKeys = () => {
+    const connection = getActive()
+    if (!connection) return
+
+    const client = new BetterBaseMetaClient(connection)
+    
+    setLoading(true)
+    client.getKeys().then(result => {
+      if (result.error) {
+        setError(result.error)
+      } else {
+        setKeys(result.data || [])
+      }
+      setLoading(false)
+    })
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="API Keys" subtitle="Manage API keys and authentication" />
+        <div className="h-64 rounded-lg border border-border bg-surface-100 animate-pulse" />
+      </PageContainer>
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="API Keys" subtitle="Manage API keys and authentication" />
+        <Card className="p-8 text-center">
+          <p className="text-destructive">{error}</p>
+        </Card>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">API Keys</h1>
+    <PageContainer size="full">
+      <PageHeader 
+        title="API Keys" 
+        subtitle="Manage API keys and authentication"
+        actions={
+          <Button
+            variant="default"
+            size="sm"
+            icon={<RefreshCw className="h-3.5 w-3.5" />}
+            onClick={refreshKeys}
+          >
+            Refresh
+          </Button>
+        }
+      />
 
-      <Card>
+      <Card className="bg-surface-100">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <Key className="h-4 w-4 text-foreground-light" />
             API Keys
+            <Badge variant="secondary">{keys.length}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -76,23 +114,26 @@ export default function ApiPage() {
               {keys.map((key) => (
                 <TableRow key={key.id}>
                   <TableCell>
-                    <span className={key.keyType === "service_role" ? "text-destructive font-medium" : ""}>
+                    <Badge variant={key.keyType === "service_role" ? "destructive" : "outline"}>
                       {key.keyType}
-                    </span>
+                    </Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-sm">{key.keyPrefix}...</TableCell>
-                  <TableCell>
+                  <TableCell className="font-mono text-sm text-foreground-light">{key.keyPrefix}...</TableCell>
+                  <TableCell className="text-foreground-light">
                     {new Date(key.createdAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-foreground-light">
                     {key.lastUsedAt ? new Date(key.lastUsedAt).toLocaleDateString() : "Never"}
                   </TableCell>
                 </TableRow>
               ))}
               {keys.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
-                    No API keys found
+                  <TableCell colSpan={4} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-2">
+                      <Key className="h-8 w-8 text-foreground-muted" />
+                      <p className="text-sm text-foreground-light">No API keys found</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -100,6 +141,6 @@ export default function ApiPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }

@@ -4,8 +4,10 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useConnectionStore } from "@/lib/store"
 import { BetterBaseMetaClient, TableInfo } from "@/lib/betterbase-client"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 import { Database } from "lucide-react"
 
 export default function TablesPage() {
@@ -38,29 +40,37 @@ export default function TablesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="Tables" subtitle="Browse and manage your database tables" />
+        <div className="h-64 rounded-lg border border-border bg-surface-100 animate-pulse" />
+      </PageContainer>
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="Tables" subtitle="Browse and manage your database tables" />
+        <Card className="p-8 text-center">
+          <p className="text-destructive">{error}</p>
+        </Card>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Tables</h1>
+    <PageContainer size="full">
+      <PageHeader 
+        title="Tables" 
+        subtitle="Browse and manage your database tables"
+      />
 
-      <Card>
+      <Card className="bg-surface-100">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <Database className="h-4 w-4 text-foreground-light" />
             Database Tables
+            <Badge variant="secondary">{tables.length}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -77,18 +87,23 @@ export default function TablesPage() {
                   <TableCell>
                     <Link
                       href={`/dashboard/tables/${table.name}`}
-                      className="text-primary hover:underline font-medium"
+                      className="text-brand hover:underline font-medium"
                     >
                       {table.name}
                     </Link>
                   </TableCell>
-                  <TableCell>{table.count}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{table.count.toLocaleString()} rows</Badge>
+                  </TableCell>
                 </TableRow>
               ))}
               {tables.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center text-muted-foreground">
-                    No tables found
+                  <TableCell colSpan={2} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-2">
+                      <Database className="h-8 w-8 text-foreground-muted" />
+                      <p className="text-sm text-foreground-light">No tables found</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -96,6 +111,6 @@ export default function TablesPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }

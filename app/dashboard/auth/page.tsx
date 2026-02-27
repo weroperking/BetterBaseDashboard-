@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react"
 import { useConnectionStore } from "@/lib/store"
 import { BetterBaseMetaClient, AuthUser } from "@/lib/betterbase-client"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Users } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Users, Mail, CheckCircle, XCircle } from "lucide-react"
 
 export default function AuthPage() {
   const { getActive } = useConnectionStore()
@@ -37,29 +39,37 @@ export default function AuthPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="Authentication" subtitle="Manage users and authentication settings" />
+        <div className="h-64 rounded-lg border border-border bg-surface-100 animate-pulse" />
+      </PageContainer>
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="Authentication" subtitle="Manage users and authentication settings" />
+        <Card className="p-8 text-center">
+          <p className="text-destructive">{error}</p>
+        </Card>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Authentication</h1>
+    <PageContainer size="full">
+      <PageHeader 
+        title="Authentication" 
+        subtitle="Manage users and authentication settings"
+      />
 
-      <Card>
+      <Card className="bg-surface-100">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Users ({users.length})
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <Users className="h-4 w-4 text-foreground-light" />
+            Users
+            <Badge variant="secondary">{users.length}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -76,19 +86,37 @@ export default function AuthPage() {
               {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    {user.emailVerified ? "Yes" : "No"}
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-3.5 w-3.5 text-foreground-muted" />
+                      {user.email}
+                    </div>
                   </TableCell>
                   <TableCell>
+                    {user.emailVerified ? (
+                      <Badge variant="brand" className="gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Yes
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="gap-1">
+                        <XCircle className="h-3 w-3" />
+                        No
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-foreground-light">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))}
               {users.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
-                    No users found
+                  <TableCell colSpan={4} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-2">
+                      <Users className="h-8 w-8 text-foreground-muted" />
+                      <p className="text-sm text-foreground-light">No users found</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -96,6 +124,6 @@ export default function AuthPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }

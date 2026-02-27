@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useConnectionStore } from "@/lib/store"
+import { Loader2 } from "lucide-react"
 
 export default function HomePage() {
   const router = useRouter()
@@ -18,8 +19,11 @@ export default function HomePage() {
   }, [getActive, router])
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="text-muted-foreground">Loading...</div>
+    <div className="flex h-screen w-full items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+        <p className="text-sm text-foreground-light">Loading...</p>
+      </div>
     </div>
   )
 }

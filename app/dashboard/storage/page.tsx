@@ -2,6 +2,11 @@
 
 import { useState } from "react"
 import { useStorageBuckets, useStorageFiles, useDeleteStorageFile } from "@/hooks/use-storage"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { HardDrive, File, Folder, Trash2, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -27,81 +32,74 @@ export default function StoragePage() {
 
   if (bucketsLoading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Storage</h1>
-        </div>
-        <div className="h-64 rounded-lg border border-border bg-muted animate-pulse" />
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="Storage" subtitle="S3-compatible object storage" />
+        <div className="h-64 rounded-lg border border-border bg-surface-100 animate-pulse" />
+      </PageContainer>
     )
   }
 
   if (bucketsError || !buckets || buckets.length === 0) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Storage</h1>
-          <p className="text-sm text-muted-foreground mt-1">S3-compatible object storage</p>
-        </div>
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <HardDrive className="h-12 w-12 text-muted-foreground/30 mb-4" />
+      <PageContainer size="full">
+        <PageHeader title="Storage" subtitle="S3-compatible object storage" />
+        <Card className="p-12 text-center">
+          <HardDrive className="h-12 w-12 text-foreground-muted mx-auto mb-4" />
           <p className="text-sm font-medium text-foreground">Storage not configured</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-foreground-light mt-1">
             Add a storage provider during project setup or configuration
           </p>
-          <code className="mt-3 px-3 py-1.5 rounded bg-muted text-xs font-mono text-muted-foreground">
+          <code className="mt-4 inline-block px-3 py-1.5 rounded bg-surface-200 text-xs font-mono text-foreground-light">
             bb init → select storage provider
           </code>
-        </div>
-      </div>
+        </Card>
+      </PageContainer>
     )
   }
 
   const bucket = buckets[0]
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Storage</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Browse and manage files in your object storage bucket
-        </p>
-      </div>
+    <PageContainer size="full">
+      <PageHeader 
+        title="Storage" 
+        subtitle="Browse and manage files in your object storage bucket"
+      />
 
       {/* Bucket info card */}
-      <div className="rounded-lg border border-border bg-card p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-md bg-primary/10 flex items-center justify-center">
-            <HardDrive className="h-4 w-4 text-primary" />
+      <Card className="bg-surface-100 mb-6">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-md bg-brand/10 flex items-center justify-center">
+              <HardDrive className="h-5 w-5 text-brand" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold font-mono text-foreground">{bucket.name}</p>
+              <p className="text-xs text-foreground-light">
+                {bucket.provider}
+                {bucket.region && ` · ${bucket.region}`}
+                {bucket.endpoint && !bucket.region && ` · ${bucket.endpoint}`}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold font-mono text-foreground">{bucket.name}</p>
-            <p className="text-xs text-muted-foreground">
-              {bucket.provider}
-              {bucket.region && ` · ${bucket.region}`}
-              {bucket.endpoint && !bucket.region && ` · ${bucket.endpoint}`}
-            </p>
-          </div>
-        </div>
-        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-600 border border-green-500/20">
-          Connected
-        </span>
-      </div>
+          <Badge variant="brand">Connected</Badge>
+        </CardContent>
+      </Card>
 
       {/* Breadcrumb navigation */}
-      <div className="flex items-center gap-1 text-sm flex-wrap">
+      <div className="flex items-center gap-1 text-sm flex-wrap mb-4">
         <button
           onClick={() => setPrefix("")}
-          className="text-primary hover:underline font-mono text-xs"
+          className="text-brand hover:underline font-mono text-xs"
         >
           {bucket.name}
         </button>
         {breadcrumbs.map((crumb, i) => (
           <span key={i} className="flex items-center gap-1">
-            <ChevronRight className="h-3 w-3 text-muted-foreground" />
+            <ChevronRight className="h-3 w-3 text-foreground-muted" />
             <button
               onClick={() => setPrefix(breadcrumbs.slice(0, i + 1).join("/") + "/")}
-              className="text-primary hover:underline font-mono text-xs"
+              className="text-brand hover:underline font-mono text-xs"
             >
               {crumb}
             </button>
@@ -110,82 +108,73 @@ export default function StoragePage() {
       </div>
 
       {/* File browser */}
-      <div className="rounded-lg border border-border overflow-hidden">
+      <Card className="bg-surface-100 overflow-hidden">
         {filesLoading ? (
           <div className="p-4 space-y-2">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-10 rounded bg-muted animate-pulse" />
+              <div key={i} className="h-10 rounded bg-surface-200 animate-pulse" />
             ))}
           </div>
         ) : !files || files.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Folder className="h-8 w-8 text-muted-foreground/40 mb-2" />
-            <p className="text-sm text-muted-foreground">
+            <Folder className="h-8 w-8 text-foreground-muted mb-2" />
+            <p className="text-sm text-foreground-light">
               {prefix ? "This folder is empty" : "No files in this bucket"}
             </p>
           </div>
         ) : (
           <>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">
-                    Name
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">
-                    Size
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">
-                    Last modified
-                  </th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground">
-                    Type
-                  </th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead>Last modified</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead className="w-24" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {files.map(file => {
                   const displayName = file.key.replace(prefix, "")
                   const isFolder = displayName.endsWith("/")
                   return (
-                    <tr
-                      key={file.key}
-                      className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
-                    >
-                      <td className="px-4 py-3">
+                    <TableRow key={file.key}>
+                      <TableCell>
                         <button
                           onClick={() => isFolder && setPrefix(file.key)}
                           disabled={!isFolder}
                           className="flex items-center gap-2 text-left"
                         >
                           {isFolder ? (
-                            <Folder className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                            <Folder className="h-4 w-4 text-warning flex-shrink-0" />
                           ) : (
-                            <File className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                            <File className="h-4 w-4 text-foreground-muted flex-shrink-0" />
                           )}
                           <span className={cn(
                             "text-xs font-mono",
-                            isFolder ? "text-primary hover:underline cursor-pointer" : "text-foreground"
+                            isFolder ? "text-brand hover:underline cursor-pointer" : "text-foreground"
                           )}>
                             {displayName}
                           </span>
                         </button>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                      </TableCell>
+                      <TableCell className="text-xs text-foreground-light">
                         {isFolder ? "—" : formatBytes(file.size)}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                      </TableCell>
+                      <TableCell className="text-xs text-foreground-light">
                         {isFolder ? "—" : new Date(file.lastModified).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3 text-xs font-mono text-muted-foreground">
+                      </TableCell>
+                      <TableCell className="text-xs font-mono text-foreground-light">
                         {isFolder ? "folder" : (file.contentType ?? "—")}
-                      </td>
-                      <td className="px-4 py-3 text-right">
+                      </TableCell>
+                      <TableCell className="text-right">
                         {!isFolder && (
                           deleteKey === file.key ? (
                             <div className="flex items-center justify-end gap-2">
-                              <button
+                              <Button
+                                size="sm"
+                                variant="destructive"
                                 onClick={() => {
                                   setDeleteError(null)
                                   deleteFile.mutate(file.key, {
@@ -193,40 +182,41 @@ export default function StoragePage() {
                                     onError: (err) => setDeleteError(String(err)),
                                   })
                                 }}
-                                className="px-2 py-0.5 rounded text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               >
                                 Delete
-                              </button>
-                              <button
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="default"
                                 onClick={() => { setDeleteKey(null); setDeleteError(null) }}
-                                className="px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground hover:text-foreground"
                               >
                                 Cancel
-                              </button>
+                              </Button>
                             </div>
                           ) : (
-                            <button
+                            <Button
+                              size="icon"
+                              variant="ghost"
                               onClick={() => setDeleteKey(file.key)}
-                              className="p-1.5 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           )
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   )
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
             {deleteError && (
-              <div className="px-4 py-3 bg-red-500/10 border-t border-destructive/20">
+              <div className="px-4 py-3 bg-destructive/10 border-t border-destructive/20">
                 <p className="text-xs text-destructive">Failed to delete file: {deleteError}</p>
               </div>
             )}
           </>
         )}
-      </div>
-    </div>
+      </Card>
+    </PageContainer>
   )
 }

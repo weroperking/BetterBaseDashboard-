@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useConnectionStore } from "@/lib/store"
 import { BetterBaseMetaClient, Stats, ChartDataPoint } from "@/lib/betterbase-client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
 import { Users, Activity, FileText, AlertCircle } from "lucide-react"
 
 export default function DashboardPage() {
@@ -44,17 +45,21 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
+      <PageContainer>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-foreground-light">Loading...</p>
+        </div>
+      </PageContainer>
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <PageContainer>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-destructive">{error}</p>
+        </div>
+      </PageContainer>
     )
   }
 
@@ -82,8 +87,11 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Overview</h1>
+    <PageContainer>
+      <PageHeader
+        title="Overview"
+        subtitle="Dashboard overview and key metrics for your project."
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => (
@@ -92,16 +100,16 @@ export default function DashboardPage() {
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
+              <stat.icon className="h-4 w-4 text-foreground-muted" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Card>
+      <Card className="mt-6">
         <CardHeader>
           <CardTitle>Request Volume (Last 24 Hours)</CardTitle>
         </CardHeader>
@@ -111,18 +119,18 @@ export default function DashboardPage() {
               {chartData.map((point, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                   <div
-                    className="w-full bg-primary rounded-t"
+                    className="w-full bg-brand rounded-t"
                     style={{ height: `${Math.min((point.requests / Math.max(...chartData.map(d => d.requests))) * 100, 100)}%` }}
                   />
-                  <span className="text-xs text-muted-foreground">{point.hour}</span>
+                  <span className="text-xs text-foreground-light">{point.hour}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">No data available</p>
+            <p className="text-foreground-light text-sm">No data available</p>
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }

@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useConnectionStore } from "@/lib/store"
 import { Sidebar } from "@/components/layout/sidebar"
-import { Header } from "@/components/layout/header"
+import { DashboardHeader } from "@/components/layout/header"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -21,10 +21,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* Fixed Sidebar */}
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header connection={connection} />
-        <main className="flex-1 overflow-y-auto p-6">
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        {/* Top Header Bar */}
+        <DashboardHeader />
+
+        {/* Page Content - Scrollable */}
+        <main className="flex-1 overflow-y-auto bg-background">
           {children}
         </main>
       </div>

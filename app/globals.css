@@ -4,77 +4,197 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Supabase Design System - Light Theme */
+    
+    /* Foreground Colors */
+    --foreground: #171717;
+    --foreground-light: #525252;
+    --foreground-lighter: #707070;
+    --foreground-muted: #b2b2b2;
+    
+    /* Brand Colors (Green) */
+    --brand: #3fcf8e;
+    --brand-200: #e5f9f0;
+    --brand-300: #9fe9c7;
+    --brand-400: #7fe0b0;
+    --brand-500: #5fd799;
+    --brand-600: #3fcf8e;
+    
+    /* Warning Colors (Amber) */
+    --warning: #dc7b18;
+    --warning-200: #fcf3e6;
+    --warning-300: #f5d6a8;
+    --warning-400: #f0c07c;
+    --warning-500: #e8a54f;
+    --warning-600: #dc7b18;
+    
+    /* Destructive Colors (Red) */
+    --destructive: #e54d2e;
+    --destructive-200: #fdeceb;
+    --destructive-300: #f9c4ba;
+    --destructive-400: #f5a592;
+    --destructive-500: #f1866b;
+    --destructive-600: #e54d2e;
+    
+    /* Background & Surface Colors */
+    --background: #fcfcfc;
+    --surface-75: #ffffff;
+    --surface-100: #fcfcfc;
+    --surface-200: #f3f3f3;
+    --surface-300: #ededed;
+    --surface-400: #e6e6e6;
+    
+    /* Border Colors */
+    --border: #dfdfdf;
+    --border-strong: #d4d4d4;
+    --border-stronger: #8f8f8f;
+    
+    /* Scale Colors (Neutral Grays) */
+    --colors-scale1: #fcfcfc;
+    --colors-scale2: #f8f8f8;
+    --colors-scale3: #f3f3f3;
+    --colors-scale4: #ededed;
+    --colors-scale5: #e6e6e6;
+    --colors-scale6: #dedede;
+    --colors-scale7: #d4d4d4;
+    --colors-scale8: #bbbbbb;
+    --colors-scale9: #8f8f8f;
+    --colors-scale10: #7a7a7a;
+    --colors-scale11: #525252;
+    --colors-scale12: #171717;
+    
+    /* Legacy shadcn/ui compatibility (HSL format) */
+    --background-hsl: 0 0% 99%;
+    --foreground-hsl: 0 0% 9%;
+    
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 0 0% 9%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-
+    --popover-foreground: 0 0% 9%;
+    
+    --primary: 152 68% 56%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 9%;
+    
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 45%;
+    
+    --accent: 152 68% 56%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive-hsl: 11 77% 54%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border-hsl: 0 0% 87%;
+    --input: 0 0% 87%;
+    --ring: 152 68% 56%;
+    
     --radius: 0.5rem;
-
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    
+    --chart-1: 152 68% 56%;
+    --chart-2: 32 78% 48%;
+    --chart-3: 11 77% 54%;
+    --chart-4: 210 100% 56%;
+    --chart-5: 270 60% 55%;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+  [data-theme="dark"] {
+    /* Supabase Design System - Dark Theme */
+    
+    /* Foreground Colors */
+    --foreground: #f8f8f8;
+    --foreground-light: #c2c2c2;
+    --foreground-lighter: #9e9e9e;
+    --foreground-muted: #6b6b6b;
+    
+    /* Brand Colors remain the same */
+    --brand: #3fcf8e;
+    --brand-200: #e5f9f0;
+    --brand-300: #9fe9c7;
+    --brand-400: #7fe0b0;
+    --brand-500: #5fd799;
+    --brand-600: #3fcf8e;
+    
+    /* Warning Colors */
+    --warning: #f5a623;
+    --warning-200: #3d2e14;
+    --warning-300: #7a5c28;
+    --warning-400: #b88a3c;
+    --warning-500: #f5a623;
+    --warning-600: #ffb84d;
+    
+    /* Destructive Colors */
+    --destructive: #f87171;
+    --destructive-200: #3d1f1a;
+    --destructive-300: #7a3e35;
+    --destructive-400: #b85d4f;
+    --destructive-500: #f87171;
+    --destructive-600: #ff9e8a;
+    
+    /* Background & Surface Colors */
+    --background: #1c1c1c;
+    --surface-75: #232323;
+    --surface-100: #1c1c1c;
+    --surface-200: #2e2e2e;
+    --surface-300: #363636;
+    --surface-400: #3e3e3e;
+    
+    /* Border Colors */
+    --border: #3e3e3e;
+    --border-strong: #4a4a4a;
+    --border-stronger: #6b6b6b;
+    
+    /* Scale Colors (Dark Neutral Grays) */
+    --colors-scale1: #1c1c1c;
+    --colors-scale2: #232323;
+    --colors-scale3: #2e2e2e;
+    --colors-scale4: #363636;
+    --colors-scale5: #3e3e3e;
+    --colors-scale6: #4a4a4a;
+    --colors-scale7: #505050;
+    --colors-scale8: #707070;
+    --colors-scale9: #7a7a7a;
+    --colors-scale10: #b4b4b4;
+    --colors-scale11: #eeeeee;
+    --colors-scale12: #f8f8f8;
+    
+    /* Legacy shadcn/ui compatibility (HSL format) */
+    --background-hsl: 0 0% 11%;
+    --foreground-hsl: 0 0% 97%;
+    
+    --card: 0 0% 14%;
+    --card-foreground: 0 0% 97%;
+    
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 97%;
+    
+    --primary: 152 68% 56%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 97%;
+    
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 60%;
+    
+    --accent: 152 68% 56%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive-hsl: 0 91% 71%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border-hsl: 0 0% 24%;
+    --input: 0 0% 24%;
+    --ring: 152 68% 56%;
+    
+    --chart-1: 152 68% 56%;
+    --chart-2: 32 78% 48%;
+    --chart-3: 0 91% 71%;
+    --chart-4: 210 100% 56%;
+    --chart-5: 270 60% 65%;
   }
 }
 
@@ -82,7 +202,34 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Smooth transitions for theme changes */
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+}
+
+@layer utilities {
+  /* Typography utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Focus visible styles */
+  .focus-ring {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-background;
   }
 }

@@ -1,60 +1,62 @@
 "use client"
 
 import { Activity, Users, List } from "lucide-react"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { useRealtime } from "@/hooks/use-realtime"
 
 function LoadingState() {
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <div className="h-8 w-32 animate-pulse rounded bg-muted" />
-        <div className="h-4 w-64 animate-pulse rounded bg-muted" />
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <PageContainer size="full">
+      <PageHeader title="Realtime" subtitle="Monitor WebSocket connections" />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
         {[1, 2, 3].map((i) => (
-          <Card key={i}>
+          <Card key={i} className="bg-surface-100">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-              <div className="h-4 w-4 animate-pulse rounded bg-muted" />
+              <div className="h-4 w-20 animate-pulse rounded bg-surface-200" />
+              <div className="h-4 w-4 animate-pulse rounded bg-surface-200" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 w-12 animate-pulse rounded bg-muted" />
+              <div className="h-8 w-12 animate-pulse rounded bg-surface-200" />
             </CardContent>
           </Card>
         ))}
       </div>
-      <Card>
+      <Card className="bg-surface-100">
         <CardHeader>
-          <div className="h-5 w-32 animate-pulse rounded bg-muted" />
+          <div className="h-5 w-32 animate-pulse rounded bg-surface-200" />
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-8 w-full animate-pulse rounded bg-muted" />
+              <div key={i} className="h-8 w-full animate-pulse rounded bg-surface-200" />
             ))}
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="flex items-center justify-center h-full">
-      <p className="text-destructive">{message}</p>
-    </div>
+    <PageContainer size="full">
+      <PageHeader title="Realtime" subtitle="Monitor WebSocket connections" />
+      <Card className="p-8 text-center">
+        <p className="text-destructive">{message}</p>
+      </Card>
+    </PageContainer>
   )
 }
 
 function EmptyState() {
   return (
-    <Card>
-      <CardContent className="flex flex-col items-center justify-center py-10">
-        <Activity className="h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-muted-foreground text-center">No realtime data available</p>
-        <p className="text-sm text-muted-foreground text-center mt-1">
+    <Card className="bg-surface-100">
+      <CardContent className="flex flex-col items-center justify-center py-12">
+        <Activity className="h-12 w-12 text-foreground-muted mb-4" />
+        <p className="text-foreground-light text-center">No realtime data available</p>
+        <p className="text-sm text-foreground-light text-center mt-1">
           Connect to a project to monitor WebSocket connections
         </p>
       </CardContent>
@@ -75,57 +77,56 @@ export default function RealtimePage() {
 
   if (!data) {
     return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-semibold">Realtime</h1>
-        <p className="text-muted-foreground">Monitor WebSocket connections</p>
+      <PageContainer size="full">
+        <PageHeader title="Realtime" subtitle="Monitor WebSocket connections" />
         <EmptyState />
-      </div>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Realtime</h1>
-      <p className="text-muted-foreground">Monitor WebSocket connections</p>
+    <PageContainer size="full">
+      <PageHeader title="Realtime" subtitle="Monitor WebSocket connections" />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
+        <Card className="bg-surface-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Connected Clients</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-foreground-light">Connected Clients</CardTitle>
+            <Users className="h-4 w-4 text-foreground-muted" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.connectedClients}</div>
-            <p className="text-xs text-muted-foreground">Active WebSocket connections</p>
+            <p className="text-xs text-foreground-light">Active WebSocket connections</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-surface-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Subscriptions</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-foreground-light">Total Subscriptions</CardTitle>
+            <Activity className="h-4 w-4 text-foreground-muted" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.totalSubscriptions}</div>
-            <p className="text-xs text-muted-foreground">Active table subscriptions</p>
+            <p className="text-xs text-foreground-light">Active table subscriptions</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-surface-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Subscribed Tables</CardTitle>
-            <List className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-foreground-light">Subscribed Tables</CardTitle>
+            <List className="h-4 w-4 text-foreground-muted" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.subscribedTables.length}</div>
-            <p className="text-xs text-muted-foreground">Tables being monitored</p>
+            <p className="text-xs text-foreground-light">Tables being monitored</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-surface-100">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <List className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <List className="h-4 w-4 text-foreground-light" />
             Subscribed Tables
+            <Badge variant="secondary">{data.subscribedTables.length}</Badge>
           </CardTitle>
           <CardDescription>
             Tables with active realtime subscriptions
@@ -136,18 +137,19 @@ export default function RealtimePage() {
             <ul className="space-y-2">
               {data.subscribedTables.map((table) => (
                 <li key={table} className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
+                  <div className="h-2 w-2 rounded-full bg-brand" />
                   <span className="font-mono text-sm">{table}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-muted-foreground text-center py-4">
-              No tables are currently subscribed
-            </p>
+            <div className="text-center py-8">
+              <List className="h-8 w-8 text-foreground-muted mx-auto mb-2" />
+              <p className="text-sm text-foreground-light">No tables are currently subscribed</p>
+            </div>
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }

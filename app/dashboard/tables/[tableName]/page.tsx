@@ -2,10 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
+import Link from "next/link"
 import { useConnectionStore } from "@/lib/store"
 import { BetterBaseMetaClient } from "@/lib/betterbase-client"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Database, Table2, ChevronRight } from "lucide-react"
 
 export default function TableEditorPage() {
   const params = useParams()
@@ -41,29 +45,54 @@ export default function TableEditorPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
+      <PageContainer size="full">
+        <nav className="flex items-center gap-2 text-sm text-foreground-light mb-4">
+          <Link href="/dashboard/tables" className="hover:text-foreground hover:underline">Tables</Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="font-mono text-foreground">{tableName}</span>
+        </nav>
+        <div className="h-96 rounded-lg border border-border bg-surface-100 animate-pulse" />
+      </PageContainer>
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <PageContainer size="full">
+        <nav className="flex items-center gap-2 text-sm text-foreground-light mb-4">
+          <Link href="/dashboard/tables" className="hover:text-foreground hover:underline">Tables</Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="font-mono text-foreground">{tableName}</span>
+        </nav>
+        <Card className="p-8 text-center">
+          <p className="text-destructive">{error}</p>
+        </Card>
+      </PageContainer>
     )
   }
 
   const columns = rows.length > 0 ? Object.keys(rows[0]) : []
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{tableName}</h1>
+    <PageContainer size="full">
+      <nav className="flex items-center gap-2 text-sm text-foreground-light mb-4">
+        <Link href="/dashboard/tables" className="hover:text-foreground hover:underline">Tables</Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="font-mono text-foreground">{tableName}</span>
+      </nav>
 
-      <Card>
+      <PageHeader 
+        title={tableName}
+        subtitle={`${rows.length.toLocaleString()} rows`}
+      />
+
+      <Card className="bg-surface-100">
         <CardHeader>
-          <CardTitle>Rows ({rows.length})</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <Table2 className="h-4 w-4 text-foreground-light" />
+            Table Data
+            <Badge variant="secondary">{rows.length.toLocaleString()} rows</Badge>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {columns.length > 0 ? (
@@ -72,7 +101,7 @@ export default function TableEditorPage() {
                 <TableHeader>
                   <TableRow>
                     {columns.map((col) => (
-                      <TableHead key={col}>{col}</TableHead>
+                      <TableHead key={col} className="font-mono text-xs">{col}</TableHead>
                     ))}
                   </TableRow>
                 </TableHeader>
@@ -80,7 +109,7 @@ export default function TableEditorPage() {
                   {rows.map((row, i) => (
                     <TableRow key={i}>
                       {columns.map((col) => (
-                        <TableCell key={col} className="font-mono text-sm">
+                        <TableCell key={col} className="font-mono text-xs text-foreground-light">
                           {String(row[col] ?? "")}
                         </TableCell>
                       ))}
@@ -90,10 +119,13 @@ export default function TableEditorPage() {
               </Table>
             </div>
           ) : (
-            <p className="text-muted-foreground">No rows found</p>
+            <div className="text-center py-12">
+              <Database className="h-8 w-8 text-foreground-muted mx-auto mb-2" />
+              <p className="text-sm text-foreground-light">No rows found</p>
+            </div>
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }

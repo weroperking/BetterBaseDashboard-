@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react"
 import { useConnectionStore } from "@/lib/store"
 import { BetterBaseMetaClient, LogEntry } from "@/lib/betterbase-client"
+import { PageContainer, PageHeader } from "@/components/layout/page-container"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { FileText } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { FileText, RefreshCw } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function LogsPage() {
   const { getActive } = useConnectionStore()
@@ -35,48 +38,83 @@ export default function LogsPage() {
     fetchLogs()
   }, [getActive])
 
+  const refreshLogs = () => {
+    const connection = getActive()
+    if (!connection) return
+
+    const client = new BetterBaseMetaClient(connection)
+    
+    setLoading(true)
+    client.getLogs().then(result => {
+      if (result.error) {
+        setError(result.error)
+      } else {
+        setLogs(result.data || [])
+      }
+      setLoading(false)
+    })
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="Request Logs" subtitle="View recent API request logs" />
+        <div className="h-64 rounded-lg border border-border bg-surface-100 animate-pulse" />
+      </PageContainer>
     )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-destructive">{error}</p>
-      </div>
+      <PageContainer size="full">
+        <PageHeader title="Request Logs" subtitle="View recent API request logs" />
+        <Card className="p-8 text-center">
+          <p className="text-destructive">{error}</p>
+        </Card>
+      </PageContainer>
     )
   }
 
-  const getStatusColor = (status: number) => {
-    if (status >= 200 && status < 300) return "text-green-500"
-    if (status >= 400 && status < 500) return "text-yellow-500"
-    if (status >= 500) return "text-red-500"
-    return ""
+  const getStatusBadge = (status: number) => {
+    if (status >= 200 && status < 300) return <Badge variant="brand">{status}</Badge>
+    if (status >= 400 && status < 500) return <Badge variant="warning">{status}</Badge>
+    if (status >= 500) return <Badge variant="destructive">{status}</Badge>
+    return <Badge variant="outline">{status}</Badge>
   }
 
-  const getMethodColor = (method: string) => {
+  const getMethodBadge = (method: string) => {
     switch (method) {
-      case "GET": return "text-blue-500"
-      case "POST": return "text-green-500"
-      case "PUT": return "text-yellow-500"
-      case "DELETE": return "text-red-500"
-      default: return ""
+      case "GET": return <Badge variant="outline" className="text-blue-500 border-blue-500/20">GET</Badge>
+      case "POST": return <Badge variant="outline" className="text-green-500 border-green-500/20">POST</Badge>
+      case "PUT": return <Badge variant="outline" className="text-yellow-500 border-yellow-500/20">PUT</Badge>
+      case "DELETE": return <Badge variant="outline" className="text-destructive border-destructive/20">DELETE</Badge>
+      default: return <Badge variant="outline">{method}</Badge>
     }
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Request Logs</h1>
+    <PageContainer size="full">
+      <PageHeader 
+        title="Request Logs" 
+        subtitle="View recent API request logs"
+        actions={
+          <Button
+            variant="default"
+            size="sm"
+            icon={<RefreshCw className="h-3.5 w-3.5" />}
+            onClick={refreshLogs}
+          >
+            Refresh
+          </Button>
+        }
+      />
 
-      <Card>
+      <Card className="bg-surface-100">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Recent Requests ({logs.length})
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
+            <FileText className="h-4 w-4 text-foreground-light" />
+            Recent Requests
+            <Badge variant="secondary">{logs.length}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -93,27 +131,22 @@ export default function LogsPage() {
             <TableBody>
               {logs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell>
-                    <span className={`font-medium ${getMethodColor(log.method)}`}>
-                      {log.method}
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">{log.path}</TableCell>
-                  <TableCell>
-                    <span className={getStatusColor(log.statusCode)}>
-                      {log.statusCode}
-                    </span>
-                  </TableCell>
-                  <TableCell>{log.responseTimeMs}ms</TableCell>
-                  <TableCell>
+                  <TableCell>{getMethodBadge(log.method)}</TableCell>
+                  <TableCell className="font-mono text-sm text-foreground-light">{log.path}</TableCell>
+                  <TableCell>{getStatusBadge(log.statusCode)}</TableCell>
+                  <TableCell className="text-foreground-light">{log.responseTimeMs}ms</TableCell>
+                  <TableCell className="text-foreground-light text-xs">
                     {new Date(log.createdAt).toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
               {logs.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No logs found
+                  <TableCell colSpan={5} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-2">
+                      <FileText className="h-8 w-8 text-foreground-muted" />
+                      <p className="text-sm text-foreground-light">No logs found</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -121,6 +154,6 @@ export default function LogsPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }
