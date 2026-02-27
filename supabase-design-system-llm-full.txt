@@ -1,0 +1,2668 @@
+# Supabase Design System — LLM Full Reference
+# Source: https://supabase.com/design-system
+# Mirror: https://supabase-design-system.vercel.app
+# GitHub: https://github.com/supabase/supabase/tree/master/apps/design-system
+# Generated: 2026-02-27
+# Purpose: Complete squeezed reference of everything at supabase.com/design-system
+#          so an LLM can answer any question about the platform or help build a clone.
+
+---
+
+## TABLE OF CONTENTS
+
+1. Platform Overview
+2. Getting Started — Introduction
+3. Accessibility
+4. Color Usage
+5. Copywriting
+6. Icons
+7. Tailwind Classes
+8. Theming
+9. Typography
+10. UI Patterns — Introduction
+11. UI Patterns — Charts
+12. UI Patterns — Empty States
+13. UI Patterns — Forms
+14. UI Patterns — Layout
+15. UI Patterns — Modality
+16. UI Patterns — Navigation
+17. UI Patterns — Tables
+18. Fragment Components — Introduction
+19. Fragment Components — Admonition
+20. Fragment Components — Assistant Chat
+21. Fragment Components — Confirmation Modal
+22. Fragment Components — Data Input
+23. Fragment Components — Empty State Presentational
+24. Fragment Components — Filter Bar
+25. Fragment Components — Form Item Layout
+26. Fragment Components — Info Tooltip
+27. Fragment Components — Inner Side Menu
+28. Fragment Components — Logs Bar Chart
+29. Fragment Components — Metric Card
+30. Fragment Components — Modal
+31. Fragment Components — Multi Select
+32. Fragment Components — Page Container
+33. Fragment Components — Page Header
+34. Fragment Components — Page Section
+35. Fragment Components — Table of Contents (TOC)
+36. Fragment Components — Text Confirm Dialog
+37. Atom Components — Introduction
+38. Atom Components — All 57 Components (A–Z)
+39. Architecture: packages/ui vs packages/ui-patterns
+40. Theme System Deep-Dive (CSS Variables + Radix Scale)
+41. Animation System
+42. Icon System Deep-Dive
+43. Data Package & Token Pipeline
+
+---
+
+## 1. PLATFORM OVERVIEW
+
+**supabase.com/design-system** is the official Supabase design system documentation site.
+It documents design resources for building consistent user experiences across all Supabase products:
+Studio (dashboard), Docs site, Marketing website (www), and the CMS.
+
+The design system is organized into four sections:
+
+- **Getting Started** — Foundational standards: colors, icons, tailwind classes, theming, typography, accessibility, copywriting
+- **UI Patterns** — Design guidelines for common interface patterns (charts, empty states, forms, layout, modality, navigation, tables)
+- **Fragment Components** — Pre-assembled components composed from atoms (metric cards, modals, page headers, filter bars, etc.)
+- **Atom Components** — Primitive building blocks (57 components from Accordion to Tree View)
+
+The site was built by Supabase, inspired by Radix, shadcn/ui, and Vercel's Geist.
+Source code: https://github.com/supabase/supabase/tree/master/apps/design-system
+
+---
+
+## 2. GETTING STARTED — INTRODUCTION
+
+The design system is built on:
+- **Radix UI** for accessible, unstyled primitives
+- **Tailwind CSS** for utility-first styling with CSS custom properties
+- **shadcn/ui** as the component scaffolding layer (Supabase wraps shadcn components with `_Shadcn_` suffix convention)
+- **lucide-react** for standard UI icons
+- A custom `icons` package for Supabase-specific icons
+- **Figma** as the design source — tokens exported as JSON and transformed via scripts in `packages/ui/internals/tokens`
+
+All components live in the `packages/ui` workspace package inside the Supabase monorepo.
+Complex composed patterns live in `packages/ui-patterns`.
+
+Import convention:
+```tsx
+import { Button, Badge, Dialog } from 'ui'
+import { MetricCard } from 'ui-patterns/MetricCard'
+```
+
+---
+
+## 3. ACCESSIBILITY
+
+All components are built on Radix UI which provides WAI-ARIA compliance out of the box.
+
+Key principles:
+- All interactive components support full keyboard navigation
+- Focus management is handled automatically by Radix primitives
+- Color contrast meets WCAG AA standards at minimum
+- Disabled states use `tabIndex={-1}` — never remove focus indicators manually
+- Every icon used standalone must have an `aria-label` or be paired with visible text
+- Screen reader-only text uses `className="sr-only"`
+- Forms use `react-hook-form` with `useId()` for auto-generated IDs and proper `aria-describedby` linkage
+
+Do not tint icons with `text-destructive` alone for destructive actions — always follow with a confirmation dialog that handles the destructive styling.
+
+---
+
+## 4. COLOR USAGE
+
+**Source:** https://supabase.com/design-system/docs/color-usage
+
+### Philosophy
+The shorthand utility classes simplify the full color palette by providing sensible, contrast-checked defaults. Always use these semantic tokens instead of raw hex values or Tailwind scale numbers.
+
+### Text Colors (Foreground)
+
+| Class | Description |
+|---|---|
+| `text-foreground` | Default text color |
+| `text-foreground-light` | Light text (one step softer) |
+| `text-foreground-lighter` | Lighter text |
+| `text-foreground-muted` | Muted/disabled-looking text |
+| `text-contrast` | High contrast text |
+| `text-destructive` | Destructive/error text |
+| `text-warning` | Warning text |
+| `text-brand` | Brand green text |
+
+Use accent text colors (e.g. `text-destructive`, `text-warning`) sparingly to avoid visual overload.
+
+**Shorthands:**
+- `text-muted` = `text-foreground-muted`
+- `text-light` = `text-foreground-light`
+
+### Background Colors
+
+| Class | Description |
+|---|---|
+| `bg-200` | Deeper background (step below default) |
+| `bg` | Main app background |
+| `bg-alternative-200` | Alternative bg step |
+| `bg-alternative` | Alternative/inverted background |
+| `bg-selection` | Selected item background |
+| `bg-control` | Background for inputs, radios, checkboxes |
+| `bg-surface-75` | Lightest surface (panels on same level as bg) |
+| `bg-surface-100` | Standard surface panels |
+| `bg-surface-200` | Surfaces overlapping main content (dropdowns) |
+| `bg-surface-300` | Stacked above surface-200 |
+| `bg-surface-400` | Highest stacking layer |
+| `bg-overlay` | Overlay backgrounds (not Dialog — Dialog uses same bg as site) |
+| `bg-overlay-hover` | Hover state for overlay elements |
+| `bg-muted` | Subtle muted background |
+| `bg-button` | Default button background |
+| `bg-dialog` | Dialog background |
+| `bg-dash-sidebar` | Dashboard sidebar background |
+| `bg-dash-canvas` | Dashboard main canvas background |
+
+**Shorthand:** `bg-surface` = `bg-background-surface-100`
+
+#### App Background Convention
+
+```tsx
+// ./www and ./docs sites — uses darker background
+<body className="bg">{children}</body>
+
+// ./studio (dashboard)
+<body className="bg-studio">{children}</body>
+```
+
+#### Surface Hierarchy (Studio)
+Use `bg-surface-100` → `bg-surface-200` → `bg-surface-300` for layered depth in the dashboard.
+
+#### Data Grid Empty Space
+Use `bg-alternative` for the frame space around data grids (matches www/docs bg color, remapped for theme compatibility).
+
+#### Overlays
+Use `bg-overlay` for overlays. Dialogs use the same background as the containing site — do NOT use `bg-overlay` for dialog backgrounds.
+
+### Border Colors
+
+| Class | Description |
+|---|---|
+| `border` | Default border |
+| `border-muted` | Subtle/muted border |
+| `border-secondary` | Secondary border |
+| `border-overlay` | Overlays, dropdowns, popovers |
+| `border-control` | Inputs, radios, checkboxes |
+| `border-alternative` | Alternative/inverted border |
+| `border-strong` | Hover, focus states |
+| `border-stronger` | Highlighted/emphasis border |
+| `border-button` | Default button border |
+| `border-button-hover` | Button hover border |
+
+**Shorthand:** `border-strong` = `border-border-strong`
+
+### Brand / Destructive / Warning Color Scales
+
+Each of these tokens has a full scale from 200–600 plus DEFAULT:
+
+```
+bg-brand-200   bg-brand-300   bg-brand-400   bg-brand-500   bg-brand-600   bg-brand
+bg-destructive-200 ... bg-destructive
+bg-warning-200 ... bg-warning
+```
+
+Brand link: `bg-brand-link`
+
+Secondary: `bg-_secondary-200`, `bg-_secondary-400`, `bg-_secondary`
+
+Code block colors: `bg-code_block-1` through `bg-code_block-5`
+
+### Hex Values (light mode)
+
+| Token | Hex |
+|---|---|
+| Foreground | `#171717` |
+| Foreground Light | `#525252` |
+| Foreground Lighter | `#707070` |
+| Foreground Muted | `#b2b2b2` |
+| Brand | `#3fcf8e` |
+| Warning | `#dc7b18` |
+| Destructive | `#e54d2e` |
+| Background (default) | `#fcfcfc` |
+| Surface 75 | `#ffffff` |
+| Surface 100 | `#fcfcfc` |
+| Surface 200 | `#f3f3f3` |
+| Surface 300 | `#ededed` |
+| Overlay | `#fcfcfc` |
+| Muted | `#f7f7f7` |
+| Alternative | `#fdfdfd` |
+| Border Default | `#dfdfdf` |
+| Border Secondary | `#ededed` |
+| Border Strong | `#d4d4d4` |
+| Border Stronger | `#8f8f8f` |
+| Border Muted | `#ededed` |
+
+---
+
+## 5. COPYWRITING
+
+**Source:** https://supabase.com/design-system/docs/copywriting
+
+Write UI copy that helps developers complete tasks quickly. Be direct, action-oriented, and respectful of developer time.
+
+### Voice and Tone
+- **Direct:** Say what something does, not what it "enables" you to do
+- **Action-oriented:** Focus on what happens, not what was built
+- **Technical without jargon:** Use precise terms, explain when necessary
+- **Pragmatic:** Acknowledge tradeoffs and limitations when relevant
+
+### Buttons and Actions
+Use verbs, not nouns. Be specific about outcomes.
+
+| Bad | Good |
+|---|---|
+| "Remove" | "Delete project" |
+| "Change" | "Revoke access" |
+| "Configure" | "Enable RLS" |
+| "Submit" | "Create table" |
+| "Go back" | "Cancel" |
+
+### Form Labels and Descriptions
+Labels describe the field, not the feature. Descriptions explain constraints, not concepts.
+
+| Bad | Good |
+|---|---|
+| "Name your table" | "Table name" |
+| "This field allows you to specify a name for your table using letters, numbers, and underscores" | "Letters, numbers, and underscores only" |
+| "This ensures your table name is unique" | "Must be unique within the schema" |
+| "You can enter up to 255 characters here" | "Maximum 255 characters" |
+
+Use present tense: "Stores connection pool settings" not "Will store connection pool settings."
+
+### Error Messages
+State what went wrong, then how to fix it. Be specific. Avoid blame or apology.
+
+| Bad | Good |
+|---|---|
+| "An error occurred" | "Table name already exists. Choose a different name." |
+| "Something went wrong. Please try again." | "Invalid API key. Check your project settings." |
+| "Invalid input" | "Password must be at least 8 characters" |
+| "Sorry, we couldn't connect" | "Unable to connect to database" |
+| "Oops! Something went wrong" | "Table creation failed: column name is reserved" |
+
+### Success Messages
+Confirm what happened, briefly.
+
+| Bad | Good |
+|---|---|
+| "Success!" | "Table created successfully" |
+| "Done" | "API key revoked" |
+| "Your backup has been successfully restored to your database" | "Backup restored" |
+
+### Tooltips and Help Text
+Explain why, not what. One sentence maximum.
+
+| Bad | Good |
+|---|---|
+| "This is a toggle switch" | "Enables real-time subscriptions for this table" |
+| "Row Level Security restricts access based on user policies. When enabled, users can only access rows that match their policy conditions." | "Restricts access based on user policies" |
+
+### Navigation and Headings
+Use sentence case. Headings describe the page, not the feature.
+
+| Bad | Good |
+|---|---|
+| "Set Up Authentication" | "Set up authentication" |
+| "Manage your API keys" | "API keys" |
+| "Configure connection pooling" | "Connection pooling" |
+
+### Empty States
+Explain what's missing, then how to add it. Always include the action.
+
+| Bad | Good |
+|---|---|
+| "You don't have any tables" | "No tables yet. Create your first table to get started." |
+| "No buckets found" | "No buckets yet. [Create bucket]" |
+
+### Loading States
+Describe what's happening. Match the action verb.
+
+| Bad | Good |
+|---|---|
+| "Please wait..." | "Creating table..." |
+| "Loading..." | "Loading schema..." |
+| "Processing..." | "Applying migration..." |
+
+### Confirmations and Dialogs
+State consequences clearly. Use active voice.
+
+| Bad | Good |
+|---|---|
+| "Are you sure?" | "Delete this project? This action cannot be undone and will permanently delete all data." |
+| "All data will be removed if this project is deleted" | "Deleting this project will remove all data" |
+
+### Words to Avoid
+
+**Marketing language:**
+- "Easily" → remove
+- "Simply" → remove
+- "Powerful" → remove
+
+**Vague verbs:**
+- "Manage tables" → "Create, edit, or delete tables"
+- "Handle errors" → "View and resolve errors"
+
+### Capitalization Rules
+- **Sentence case** for all UI text (buttons, labels, headings)
+- **Product names capitalize:** Database, Auth, Storage, Edge Functions, Realtime, Vector
+- **Postgres** (not PostgreSQL)
+- **Supabase** capitalized except in code
+
+### Quick Copy Checklist
+- Does it use an action verb?
+- Is it specific about what happens?
+- Can a developer complete the task without reading more?
+- Does it avoid marketing language?
+- Is it in sentence case?
+- Is it one sentence or less (labels, buttons, tooltips)?
+
+---
+
+## 6. ICONS
+
+**Source:** https://supabase.com/design-system/docs/icons
+
+### Principles
+1. **Paired:** Icons should accompany text — they aren't often obvious enough on their own
+2. **Clear:** Icons should be legible at small sizes and unembellished. Let the text do the heavy lifting
+3. **Consistent:** Use the same icons for similar actions throughout Supabase
+
+### Tinting Icons
+Use the same color classes as text:
+```tsx
+<BucketAdd className="text-foreground-muted" />
+```
+Do NOT tint icons with `text-destructive` for destructive actions. Show a confirmation dialog instead.
+
+### UI Icons (Lucide)
+For all standard UI icon needs, use **lucide-react**: https://lucide.dev/icons/
+
+Default props: `strokeWidth={2}` and `size={24}`. Override as needed.
+
+### Custom Supabase Icons
+Import from the `icons` package:
+```tsx
+import { ReplaceCode, InsertCode, BucketAdd } from 'icons'
+
+function App() {
+  return (
+    <>
+      <ReplaceCode className="text-light" strokeWidth={1} size={16} />
+      <InsertCode className="text-light" strokeWidth={1} size={16} />
+      <BucketAdd size={24} className="text-foreground-muted" />
+    </>
+  )
+}
+```
+
+### Complete Custom Icon List
+REST-api, _example-template, analytics-bucket, api-docs, auth, axiom, big-query, box-plus, bucket-plus, database, datadog, edge-functions, files-bucket, grafana, graphql, home, insert-code, integrations, last9, logs, postgres, realtime, replace-code, reports, sentry, settings, sql-editor, storage, table-editor, user, vector-bucket
+
+### Adding a New Custom Icon
+1. Create SVG at `packages/icons/src/raw-icons/my-new-icon.svg` (kebab-case name)
+2. SVG requirements:
+   - Exported at **24×24px** with `viewBox="0 0 24 24"`
+   - Uses `stroke="currentColor"` (NO hardcoded colors)
+   - Uses `stroke-width="1.5"` unless strong reason to deviate
+   - Uses `fill="none"`
+   - Icon content optically centered, ~18×18px within the 24×24 frame
+   - No unnecessary elements: no `<clipPath>`, `<defs>`, or `<g>` wrappers
+   - Only `<path>` elements
+3. Run `npm run build:icons` from `packages/icons`
+4. Import as PascalCase: `my-new-icon.svg` → `MyNewIcon`
+
+#### Bad SVG Example ❌
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#1E1E1E" /> <!-- hardcoded color -->
+  <path d="M..." fill="#404040" /> <!-- hardcoded color -->
+  <path d="M..." stroke="#EDEDED" stroke-linecap="round" /> <!-- hardcoded color -->
+</svg>
+```
+
+#### Good SVG Example ✅
+```svg
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+  fill="none" stroke="currentColor" stroke-width="1.5"
+  stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 7C6 4.2 8.2 2 11 2H13C15.8 2 18 4.2 18 7" />
+  <path d="M4.5 11H19.5" />
+  <path d="M6 11L6.8 20C6.9 21.1 7.9 22 9 22H12" />
+</svg>
+```
+
+**Troubleshooting:** If your SVG specifies `stroke-width` on individual paths, they override the component's `strokeWidth` prop. Remove those attributes.
+
+---
+
+## 7. TAILWIND CLASSES
+
+**Source:** https://supabase.com/design-system/docs/tailwind-classes
+
+Supabase uses Tailwind classes that in turn use CSS custom properties. This supports theming so that:
+1. Themes can be updated from one place
+2. Custom or additional themes can be offered in the future
+
+### Primitives
+The six color primitive groups:
+- `background`
+- `foreground`
+- `border`
+- `brand`
+- `warning`
+- `destructive`
+
+Token values are exported from Figma as JSON and transformed into Tailwind utilities through scripts at `packages/ui/internals/tokens`.
+
+### Usage Examples
+```tsx
+// Default foreground color
+<span className="text-foreground" />
+
+// Light foreground (one notch softer)
+<span className="text-foreground-light" />
+
+// Warning color
+<span className="text-warning" />
+
+// Warning at 500 shade
+<span className="text-warning-500" />
+```
+
+### Shorthands
+- `text-muted` = `text-foreground-muted`
+- `bg-surface` = `bg-background-surface-100`
+- `border-strong` = `border-border-strong`
+
+The `background` part can be omitted on the `bg` utility: `bg-surface-100`, `bg-overlay`, `bg-alternative`.
+
+### Mixing Colors
+Any color can be used on any Tailwind utility that accepts color:
+```tsx
+// Use the text-light color as a background
+<div className="bg-foreground-light">
+  <span className="text-light">Same color, different context</span>
+</div>
+```
+
+### Opacity Support
+All colors support Tailwind opacity modifiers:
+```tsx
+<div className="bg-surface-300" />      // full opacity
+<div className="bg-surface-300/90" />   // 90%
+<div className="bg-surface-300/80" />   // 80%
+<div className="bg-surface-300/75" />   // 75%
+<div className="bg-surface-300/50" />   // 50%
+```
+
+Generated as: `hsl(--background-default) / var(--tw-bg-opacity)`
+
+### Full Token Reference Tables
+
+#### Foreground (Text)
+| Value | Usage |
+|---|---|
+| `foreground` | Default text (DEFAULT optional) |
+| `foreground-light` | Light text |
+| `foreground-lighter` | Lighter text |
+| `foreground-muted` | Muted text |
+
+#### Background
+| Value | Usage |
+|---|---|
+| `background` | Main body background |
+| `background-surface-100` | Panels and surfaces at main background level |
+| `background-surface-200` | Surfaces overlapping main content (dropdowns) |
+| `background-surface-300` | Stacked above surface-200 |
+| `background-alternative` | Alternative/inverted background |
+| `background-overlay` | Overlays, dropdowns, popovers |
+| `background-control` | Inputs, radios, checkboxes |
+| `background-button` | Button default |
+
+#### Border
+| Value | Usage |
+|---|---|
+| `border` | Default border |
+| `border-secondary` | Secondary border |
+| `border-alternative` | Alternative/inverted border |
+| `border-overlay` | Overlays, dropdowns, popovers |
+| `border-control` | Inputs, radios, checkboxes |
+| `border-strong` | Hover, focus |
+| `border-stronger` | Highlighted border |
+| `border-button` | Button default border |
+| `border-button-hover` | Button hover border |
+
+#### Brand Scale
+Values: `200`, `300`, `400`, `500`, `DEFAULT`, `600`, `button`
+
+#### Destructive Scale
+Values: `200`, `300`, `400`, `500`, `DEFAULT`, `600`
+
+#### Warning Scale
+Values: `200`, `300`, `400`, `500`, `DEFAULT`, `600`
+
+---
+
+## 8. THEMING
+
+**Source:** https://supabase.com/design-system/docs/theming
+
+### Available Themes
+- **Light** — default
+- **Dark** — classic dark mode
+- **Deep dark** — deeper dark variant
+- **System** — auto-switches based on OS preference
+
+### Theme Pipeline
+Supabase migrates to Tailwind classes using CSS custom properties. This allows:
+1. Team updates theme without changing hundreds of files
+2. Possibility of custom or additional themes in the future
+
+### Dark Mode Convention
+Supabase does NOT use Tailwind's `.dark` class convention.
+Instead, it uses a **`data-theme` attribute** on the HTML element:
+
+```html
+<html data-theme="dark">...</html>
+```
+
+The CSS selector: `[data-theme*='dark'] { ... }` overrides all CSS custom properties for dark mode.
+
+### Theme Implementation (packages/config/ui.config.js)
+
+Two key functions:
+
+**`generateColorClasses()`** — processes Radix UI color scales:
+- Excludes: bronze, brown, cyan, grass, lime, mint, olive, sky, teal, yellow
+- Creates 12-step color scales (100–1200) mapped to CSS variables
+- Generates both regular and `-fixed` variants
+- Output: `scale-100` → `var(--colors-scale1)`
+
+**`generateCssVariables()`** — creates CSS variable definitions:
+- Root: `:root { --colors-scale1: ...; ... }`
+- Dark: `[data-theme*='dark'] { --colors-scale1: ...; ... }`
+- Supports dynamic theme switching
+
+### Scale Mapping
+```
+scale-100  → var(--colors-scale1)   ← lightest
+scale-200  → var(--colors-scale2)
+scale-300  → var(--colors-scale3)
+scale-400  → var(--colors-scale4)
+scale-500  → var(--colors-scale5)
+scale-600  → var(--colors-scale6)
+scale-700  → var(--colors-scale7)
+scale-800  → var(--colors-scale8)
+scale-900  → var(--colors-scale9)
+scale-1000 → var(--colors-scale10)
+scale-1100 → var(--colors-scale11)
+scale-1200 → var(--colors-scale12)  ← darkest
+```
+
+---
+
+## 9. TYPOGRAPHY
+
+**Source:** https://supabase.com/design-system/docs/typography
+
+### Font Families
+```
+Sans: Circular, custom-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif
+Mono: "Source Code Pro", "Office Code Pro", Menlo, monospace
+```
+Free alternative to Circular: **Inter** (visually closest, available on Google Fonts).
+
+### Font Sizes
+| Size | px | Use |
+|---|---|---|
+| xs | 12px | Captions, labels, micro text |
+| sm | 14px | Body text (default), form labels |
+| base | 16px | Large body, card text |
+| lg | 18px | Section headings |
+| xl | 20px | Page sub-headings |
+| 2xl | 24px | Page headings |
+| 3xl | 36px | Display / hero headings |
+
+### Font Weights
+- Regular: `400`
+- Medium: `500`
+
+### Spacing
+- Base unit: `1 unit = 0.25rem = 4px`
+- Standard Tailwind spacing scale (4px multiples)
+
+---
+
+## 10. UI PATTERNS — INTRODUCTION
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/introduction
+
+UI Patterns establish standard approaches for common interface challenges across Supabase products.
+
+UI patterns may incorporate external libraries (e.g. `react-markdown`, `reactflow`, `recharts`) or compose various components from the `ui` package.
+
+Pattern areas:
+- **Charts** — Standardized chart types and styling
+- **Empty States** — Communicating absence of data and guiding toward meaningful actions
+- **Forms** — Cohesive form experiences in page layouts and side panels
+- **Layout** — Consistent page structures with proper spacing, max-widths, content organization
+- **Modality** — When and how to interrupt users (dialogs, sheets, drawers)
+- **Navigation** — Organizing hierarchical navigation across multiple products
+- **Tables** — Three table patterns for different data complexity levels
+
+---
+
+## 11. UI PATTERNS — CHARTS
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/charts
+
+Charts use **recharts** as the underlying library.
+Supabase wraps recharts with theme-aware styling using the design system's color tokens.
+
+Key conventions:
+- Use brand green (`#3fcf8e`) as the primary data series color
+- Use `text-foreground-muted` for axis labels and legends
+- Use `bg-surface-100` or transparent for chart backgrounds
+- Use `border` color for grid lines
+- Chart containers use `ResponsiveContainer` from recharts
+
+---
+
+## 12. UI PATTERNS — EMPTY STATES
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/empty-states
+
+Empty states communicate the absence of data and guide users toward meaningful actions.
+
+### Structure
+1. Icon (16–48px, `text-foreground-muted`)
+2. Heading: what's missing (e.g. "No tables yet")
+3. Description: what to do next (one sentence)
+4. CTA button (primary or default variant)
+
+### Copy Rules
+- Explain what's missing, then how to add it
+- Always include the action (button, link)
+- "No tables yet. Create your first table to get started."
+- "No API keys. Generate a key to connect your application."
+
+### Layout
+```tsx
+<div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+  <Icon size={40} className="text-foreground-muted" />
+  <div>
+    <h3 className="text-foreground font-medium">No tables yet</h3>
+    <p className="text-foreground-light text-sm mt-1">Create your first table to get started.</p>
+  </div>
+  <Button>Create table</Button>
+</div>
+```
+
+---
+
+## 13. UI PATTERNS — FORMS
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/forms
+
+Supabase uses **react-hook-form** + **zod** for all forms.
+
+### Key Properties
+- Accessible with ARIA attributes and proper labels
+- Supports client and server side validation
+- Well-styled and consistent with the rest of the application
+
+### Form Component (`<Form />`)
+A wrapper around react-hook-form providing:
+- Composable components for building forms
+- `<FormField />` for building controlled form fields
+- Zod validation (pluggable — any schema library works)
+- `React.useId()` for unique ID generation
+- Correct `aria-*` attributes based on field state
+- Built to work with all Radix UI components
+
+```tsx
+import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from 'ui'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+
+const formSchema = z.object({
+  tableName: z.string().min(1).regex(/^[a-z_][a-z0-9_]*$/),
+})
+
+export function CreateTableForm() {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: { tableName: '' },
+  })
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField
+          control={form.control}
+          name="tableName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Table name</FormLabel>
+              <FormControl>
+                <Input_Shadcn_ placeholder="my_table" {...field} />
+              </FormControl>
+              <FormDescription>Letters, numbers, and underscores only</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Create table</Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+### Form Placement Patterns
+- **Page forms:** Full-width with `max-w-lg` or `max-w-2xl` content width, `PageSection` wrapper
+- **Side panel forms:** Use `Sheet` or `Dialog` with `DialogSection` and `DialogSectionSeparator`
+- **Inline forms:** Small contextual forms in cards or settings rows
+
+---
+
+## 14. UI PATTERNS — LAYOUT
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/layout
+
+Consistent page structures with proper spacing, max-widths, and content organization.
+
+### Dashboard Shell (Studio)
+```
+┌─────────────────────────────────────────────────┐
+│ Sidebar (256px fixed)  │  Main Content Area      │
+│                        │  ┌───────────────────┐  │
+│  [Logo]                │  │ Page Header (48px)│  │
+│  [Nav Items]           │  ├───────────────────┤  │
+│  [Project switcher]    │  │ Page Content      │  │
+│  [Settings]            │  │ (scrollable)      │  │
+└────────────────────────┴──┴───────────────────┴──┘
+```
+
+- Sidebar: `w-64` (256px) fixed, `bg-dash-sidebar`
+- Main: `flex-1 min-w-0` flexible width
+- Top header bar: `h-12` (48px), `bg-dash-sidebar border-b`
+
+### Content Width
+- Settings pages: `max-w-2xl` (672px)
+- Forms: `max-w-lg` (512px)
+- Full-width data tables: `w-full`
+- Dashboard overview grids: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4`
+
+### Spacing
+- Section gaps: `gap-8` or `space-y-8` between major sections
+- Card padding: `p-4` or `p-6`
+- Form field gaps: `space-y-4`
+- Button groups: `gap-2` or `gap-3`
+
+---
+
+## 15. UI PATTERNS — MODALITY
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/modality
+
+Guidelines for when and how to interrupt users.
+
+### Decision Tree
+- **Simple confirmation** → AlertDialog
+- **Form in overlay** → Dialog or Sheet
+- **Destructive action requiring text confirmation** → TextConfirmDialog (fragment)
+- **Bottom sheet on mobile** → Drawer (vaul)
+- **Information without action** → Tooltip or Popover
+- **Persistent side context** → Sheet (right panel)
+
+### Dialog vs Sheet
+| Dialog | Sheet |
+|---|---|
+| Centered modal overlay | Slides from edge (usually right) |
+| Short focused tasks | Longer tasks, settings panels |
+| Max-width constraint | Full height, fixed width |
+| No scroll usually | Can scroll within |
+
+### Rules
+- Never open a dialog from another dialog (unless absolutely necessary)
+- Always provide a clear dismiss/cancel path
+- Destructive confirmations must use active voice and state consequences
+- Dialogs use the same `bg` as the containing app (not `bg-overlay`)
+
+---
+
+## 16. UI PATTERNS — NAVIGATION
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/navigation
+
+Organizing complex hierarchical navigation across multiple products.
+
+### Navigation Layers (Studio Dashboard)
+1. **Sidebar** — Primary navigation (project-level: Database, Auth, Storage, etc.)
+2. **Inner Side Menu** — Secondary navigation within a feature (e.g., Auth: Users, Providers, Policies)
+3. **Page header tabs** — Tertiary navigation within a page (e.g., Table: Columns, Indexes, RLS)
+4. **Breadcrumb** — Positional awareness
+
+### Sidebar Items
+Each sidebar item: icon (16px, `text-foreground-muted`) + label text.
+Active state: `bg-surface-200` background, `text-foreground` text.
+Hover state: `bg-surface-100` transition 100ms.
+
+### Collapsible Nav Groups
+```tsx
+<Collapsible>
+  <CollapsibleTrigger>Database</CollapsibleTrigger>
+  <CollapsibleContent>
+    <NavItem href="/tables">Tables</NavItem>
+    <NavItem href="/views">Views</NavItem>
+    <NavItem href="/functions">Functions</NavItem>
+  </CollapsibleContent>
+</Collapsible>
+```
+
+### CommandMenu (⌘K)
+The command palette provides:
+- Global search across docs and features
+- Quick navigation
+- AI assistant integration (DocsAi)
+- Theme switcher
+- Support access
+- Changelog
+
+Built on `cmdk` with Valtio for state management.
+Trigger: `Cmd+K` or `Ctrl+K`
+
+---
+
+## 17. UI PATTERNS — TABLES
+
+**Source:** https://supabase.com/design-system/docs/ui-patterns/tables
+
+Three main table patterns:
+
+### 1. Table (Presentational)
+Simple, static data display. A wrapper around `<table>` HTML element.
+
+Use when:
+- Displaying a fixed, known number of rows
+- Data is primarily read-only
+- No sort, filter, or search required
+
+```tsx
+import { Card, Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from 'ui'
+
+export function TableDemo() {
+  return (
+    <Card className="w-full">
+      <Table>
+        <TableCaption className="border-0">A list of your recent invoices</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Invoice</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Method</TableHead>
+            <TableHead className="hidden md:table-cell">Description</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {invoices.map((invoice) => (
+            <TableRow key={invoice.invoice}>
+              <TableCell className="text-foreground font-mono">{invoice.invoice}</TableCell>
+              <TableCell className="text-foreground-lighter">{invoice.paymentStatus}</TableCell>
+              <TableCell className="text-foreground-lighter">{invoice.paymentMethod}</TableCell>
+              <TableCell className="hidden md:table-cell text-foreground-muted">{invoice.description}</TableCell>
+              <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={4}>Total</TableCell>
+            <TableCell className="text-right">$2,250.00</TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table>
+    </Card>
+  )
+}
+```
+
+### 2. Data Table (TanStack Table)
+Pattern component built on `Table` + `@tanstack/react-table`.
+
+Use when:
+- Large datasets needing pagination
+- Sorting, filtering, search, or row actions required
+- Row selection needed
+
+Does NOT support: virtualization, resizable columns, advanced editors (use Data Grid for those).
+
+Key imports:
+```tsx
+import {
+  ColumnDef, ColumnFiltersState, flexRender,
+  getCoreRowModel, getFilteredRowModel, getPaginationRowModel,
+  getSortedRowModel, SortingState, useReactTable, VisibilityState,
+} from '@tanstack/react-table'
+import { ChevronDown, MoreVertical } from 'lucide-react'
+import {
+  Button, Card, Checkbox_Shadcn_, DropdownMenu, DropdownMenuCheckboxItem,
+  DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+  Input, Table, TableBody, TableCell, TableHead, TableHeader, TableHeadSort, TableRow,
+} from 'ui'
+```
+
+Column definition pattern:
+```tsx
+export const columns: ColumnDef<Payment>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox_Shadcn_
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox_Shadcn_
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    enableSorting: true,
+    cell: ({ row }) => <div className="capitalize">{row.getValue('status')}</div>,
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
+    header: () => <span className="sr-only">Actions</span>,
+    cell: ({ row }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="max-w-48">
+          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(row.original.id)}>
+            Copy ID
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>View details</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
+]
+```
+
+Sorting with `TableHeadSort`:
+```tsx
+// Convert TanStack SortingState to string format expected by TableHeadSort
+const getSortString = useMemo(() => {
+  if (sorting.length === 0) return ''
+  const sort = sorting[0]
+  return `${sort.id}:${sort.desc ? 'desc' : 'asc'}`
+}, [sorting])
+```
+
+### 3. Data Grid (react-data-grid)
+Separate implementation using `react-data-grid`. Used for:
+- Surfaces needing virtualization (Table Editor, Query Performance)
+- Column resizing
+- Spreadsheet-like editing
+
+Not exposed as a Design System component. Use only when Data Table falls short.
+
+```tsx
+import DataGrid, { Column, useRowSelection } from 'react-data-grid'
+import 'react-data-grid/lib/styles.css'
+import { Checkbox_Shadcn_, cn } from 'ui'
+```
+
+---
+
+## 18. FRAGMENT COMPONENTS — INTRODUCTION
+
+**Source:** https://supabase.com/design-system/docs/fragments/introduction
+
+Fragment Components are pre-assembled, higher-level components composed from atom components.
+They implement specific, common Supabase UI patterns.
+Fragments live in `packages/ui-patterns` and are imported with explicit paths:
+
+```tsx
+import { MetricCard } from 'ui-patterns/MetricCard'
+import { ConfirmationModal } from 'ui-patterns/Dialogs'
+```
+
+The 19 fragment components:
+Admonition, Assistant Chat, Confirmation Modal, Data Input, Empty State Presentational,
+Filter Bar, Form Item Layout, Info Tooltip, Inner Side Menu, Logs Bar Chart,
+Metric Card, Modal, Multi Select, Page Container, Page Header, Page Section,
+Table of Contents (TOC), Text Confirm Dialog, Modal
+
+---
+
+## 19. FRAGMENT — ADMONITION
+
+A styled callout block for notes, warnings, tips in documentation contexts.
+Wraps `Alert_Shadcn_` with consistent icon + title + body structure.
+
+Variants: `note`, `tip`, `caution`, `danger`
+
+---
+
+## 20. FRAGMENT — ASSISTANT CHAT
+
+Complete AI chat interface with:
+- Streaming message support
+- Command suggestions
+- Context management
+- Used in Studio for AI-assisted development (Supabase AI Copilot)
+
+Built on top of Dialog/Sheet with message list, input, and streaming response rendering.
+Imported from: `ui-patterns/CommandMenu`
+
+---
+
+## 21. FRAGMENT — CONFIRMATION MODAL
+
+A pre-built destructive-action confirmation pattern.
+
+```tsx
+import { ConfirmationModal } from 'ui-patterns/Dialogs'
+
+<ConfirmationModal
+  visible={showModal}
+  title="Delete project?"
+  confirmLabel="Delete project"
+  onConfirm={() => deleteProject()}
+  onCancel={() => setShowModal(false)}
+>
+  <p>This action cannot be undone. All data will be permanently deleted.</p>
+</ConfirmationModal>
+```
+
+---
+
+## 22. FRAGMENT — DATA INPUT
+
+Supabase-styled form input with label, description, and error state.
+Wraps Input + Label + FormMessage into a single composable unit.
+
+---
+
+## 23. FRAGMENT — EMPTY STATE PRESENTATIONAL
+
+```tsx
+import { EmptyStatePresentation } from 'ui-patterns/EmptyState'
+```
+
+Pre-built empty state with icon, heading, description, and optional CTA.
+Used across all Studio feature sections.
+
+---
+
+## 24. FRAGMENT — FILTER BAR
+
+A composable filter bar component supporting multiple filter conditions and groups.
+
+Source files:
+- `packages/ui-patterns/src/FilterBar/FilterBar.tsx`
+- `FilterCondition.tsx`
+- `FilterGroup.tsx`
+
+Used for log filtering, table filtering, and query builders.
+
+---
+
+## 25. FRAGMENT — FORM ITEM LAYOUT
+
+Standard layout wrapper for a form item: label (left or above) + control + description + error.
+Ensures consistent spacing across all forms.
+
+---
+
+## 26. FRAGMENT — INFO TOOLTIP
+
+A question-mark icon (`?`) paired with a Tooltip. Used next to form labels to explain a field.
+
+```tsx
+<InfoTooltip>Restricts access based on user policies</InfoTooltip>
+```
+
+---
+
+## 27. FRAGMENT — INNER SIDE MENU
+
+Secondary navigation sidebar within a feature section.
+Used for sub-navigation in Auth (Users, Providers, Policies), Storage, Edge Functions, etc.
+
+Structure: vertical list of nav items with active state indicator (left border accent + bg-surface-200).
+
+---
+
+## 28. FRAGMENT — LOGS BAR CHART
+
+Pre-built bar chart component for log visualization.
+Uses recharts `BarChart` with Supabase theme colors.
+Shows log events/errors over time with brand green bars.
+
+---
+
+## 29. FRAGMENT — METRIC CARD
+
+A card for displaying pull-out metrics at a glance.
+
+```tsx
+import {
+  MetricCard, MetricCardContent, MetricCardDifferential,
+  MetricCardHeader, MetricCardLabel, MetricCardSparkline, MetricCardValue,
+} from 'ui-patterns/MetricCard'
+
+<MetricCard isLoading={!data.length}>
+  <MetricCardHeader href="https://supabase.io">
+    <MetricCardLabel tooltip="The number of active users over the last 24 hours">
+      Active Users
+    </MetricCardLabel>
+  </MetricCardHeader>
+  <MetricCardContent>
+    <MetricCardValue>4,823</MetricCardValue>
+    <MetricCardDifferential variant="positive">+12.4%</MetricCardDifferential>
+  </MetricCardContent>
+  <MetricCardSparkline data={data} dataKey="value" />
+</MetricCard>
+```
+
+Variants: default, minimal, minimal-horizontal, with-icon-link-tooltip.
+`MetricCardDifferential` variants: `positive` (brand green), `negative` (destructive red).
+
+---
+
+## 30. FRAGMENT — MODAL
+
+A window overlaid on the primary window.
+Renders content underneath inert. Uses Radix `Dialog` primitive.
+
+`Modal` is Supabase's own pre-styled wrapper on top of `Dialog_Shadcn_`.
+Includes pre-wired header, content area, separator, footer.
+
+Source: `packages/ui-patterns/src/Dialogs/ConfirmDialog.tsx`
+
+---
+
+## 31. FRAGMENT — MULTI SELECT
+
+A select component supporting multiple simultaneous selections.
+Displays selected items as removable chips/badges.
+
+---
+
+## 32. FRAGMENT — PAGE CONTAINER
+
+The outermost container for a Studio page.
+Provides consistent max-width, padding, and vertical spacing.
+
+```tsx
+<PageContainer>
+  <PageHeader ... />
+  <PageSection>...</PageSection>
+</PageContainer>
+```
+
+---
+
+## 33. FRAGMENT — PAGE HEADER
+
+Standardized page header with:
+- Page title
+- Optional description
+- Optional breadcrumb
+- Optional right-side action buttons (e.g., "New table", "Create function")
+
+```tsx
+<PageHeader
+  title="Table editor"
+  subtitle="Create, edit, and delete your database tables."
+>
+  <Button>New table</Button>
+</PageHeader>
+```
+
+---
+
+## 34. FRAGMENT — PAGE SECTION
+
+Groups related content within a page.
+Provides consistent title, description, and content area with proper spacing and border separators.
+
+```tsx
+<PageSection
+  title="General settings"
+  description="Manage your project name and other general settings."
+>
+  {/* form content */}
+</PageSection>
+```
+
+---
+
+## 35. FRAGMENT — TABLE OF CONTENTS (TOC)
+
+Auto-generated sticky right-side TOC for long documentation/settings pages.
+Highlights the currently visible section.
+Used in Docs site and Studio settings pages.
+
+---
+
+## 36. FRAGMENT — TEXT CONFIRM DIALOG
+
+Destructive confirmation that requires the user to type a specific string (e.g., the project name).
+
+```tsx
+import { TextConfirmModal } from 'ui-patterns/Dialogs'
+
+<TextConfirmModal
+  visible={showModal}
+  title="Delete project"
+  confirmLabel="Delete project"
+  confirmPlaceholder="Type project name to confirm"
+  confirmString={project.name}
+  onConfirm={() => deleteProject()}
+  onCancel={() => setShowModal(false)}
+  loading={isDeleting}
+>
+  <p>This action cannot be undone. Type <strong>{project.name}</strong> to confirm.</p>
+</TextConfirmModal>
+```
+
+Source: `packages/ui-patterns/src/Dialogs/TextConfirmModal.tsx`
+
+---
+
+## 37. ATOM COMPONENTS — INTRODUCTION
+
+**Source:** https://supabase.com/design-system/docs/components/introduction
+
+Atom components are the primitive building blocks. There are 57 components.
+
+All are wrapped versions of either:
+- Radix UI primitives (suffixed `_Shadcn_` for shadcn wrappers)
+- shadcn/ui components
+- Custom Supabase components
+
+Import from `'ui'`:
+```tsx
+import { Button, Badge, Dialog, Tabs_Shadcn_, Input_Shadcn_ } from 'ui'
+```
+
+---
+
+## 38. ATOM COMPONENTS — ALL 57 (A–Z)
+
+### Accordion
+**Radix:** `@radix-ui/react-accordion`
+Vertically stacked interactive headings that each reveal a section of content.
+Animation: height `0` → `var(--radix-accordion-content-height)`, 0.2s ease-out.
+
+```tsx
+import { Accordion_Shadcn_, AccordionContent_Shadcn_, AccordionItem_Shadcn_, AccordionTrigger_Shadcn_ } from 'ui'
+
+<Accordion_Shadcn_ type="single" collapsible className="w-full">
+  <AccordionItem_Shadcn_ value="item-1">
+    <AccordionTrigger_Shadcn_>Is it accessible?</AccordionTrigger_Shadcn_>
+    <AccordionContent_Shadcn_>
+      Yes. It adheres to the WAI-ARIA design pattern.
+    </AccordionContent_Shadcn_>
+  </AccordionItem_Shadcn_>
+</Accordion_Shadcn_>
+```
+
+Tailwind animation config required:
+```js
+keyframes: {
+  'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
+  'accordion-up': { from: { height: 'var(--radix-accordion-content-height)' }, to: { height: '0' } },
+},
+animation: {
+  'accordion-down': 'accordion-down 0.2s ease-out',
+  'accordion-up': 'accordion-up 0.2s ease-out',
+},
+```
+
+---
+
+### Alert
+**Source:** shadcn/ui
+Displays a callout for user attention.
+Supabase suffixes: `Alert_Shadcn_`, `AlertTitle_Shadcn_`, `AlertDescription_Shadcn_`
+
+```tsx
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Terminal } from 'lucide-react'
+
+<Alert_Shadcn_>
+  <Terminal size={16} />
+  <AlertTitle_Shadcn_>Heads up!</AlertTitle_Shadcn_>
+  <AlertDescription_Shadcn_>You can add components using the CLI.</AlertDescription_Shadcn_>
+</Alert_Shadcn_>
+```
+
+---
+
+### Alert Dialog
+**Radix:** `@radix-ui/react-alert-dialog`
+Modal confirmation for destructive/irreversible actions.
+Always has Cancel + destructive Confirm.
+
+```tsx
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from 'ui'
+
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button type="destructive">Delete project</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+      <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction>Delete</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+---
+
+### Aspect Ratio
+**Radix:** `@radix-ui/react-aspect-ratio`
+Maintains a consistent width-to-height ratio. Used for media embeds.
+
+```tsx
+import { AspectRatio } from 'ui'
+<AspectRatio ratio={16 / 9}><img src="..." className="object-cover" /></AspectRatio>
+```
+
+---
+
+### Avatar
+**Radix:** `@radix-ui/react-avatar`
+User profile image with fallback initials.
+
+```tsx
+import { Avatar, AvatarFallback, AvatarImage } from 'ui'
+
+<Avatar>
+  <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+  <AvatarFallback>JD</AvatarFallback>
+</Avatar>
+```
+
+---
+
+### Badge
+**Source:** Custom Supabase
+Add contextual metadata to another item.
+Variants: `default`, `secondary`, `warning`, `success`, `destructive`
+
+Rules:
+- Keep to 1–2 words
+- Don't alter text case or roundedness
+- Use sparingly (designed to stand out)
+- Don't use for compute size or status — create another component for those
+
+```tsx
+import { Badge } from 'ui'
+
+<Badge variant="default">Default</Badge>
+<Badge variant="success">Active</Badge>
+<Badge variant="warning">Paused</Badge>
+<Badge variant="destructive">Error</Badge>
+```
+
+---
+
+### Breadcrumb
+**Source:** shadcn/ui
+Shows current page position in a hierarchy.
+
+```tsx
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
+  BreadcrumbPage, BreadcrumbSeparator } from 'ui'
+
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem><BreadcrumbLink href="/">Home</BreadcrumbLink></BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem><BreadcrumbLink href="/database">Database</BreadcrumbLink></BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem><BreadcrumbPage>Tables</BreadcrumbPage></BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>
+```
+
+---
+
+### Button
+**Source:** Custom Supabase
+Displays a button or component that looks like a button.
+
+Variants: `primary`, `default`, `outline`, `ghost`, `link`, `destructive`, `warning`
+Sizes: (implicit via className)
+
+Accessibility: Disabled buttons automatically get `tabIndex={-1}`. Enabled: `tabIndex={0}`. No manual `tabIndex` needed.
+
+```tsx
+import { Button } from 'ui'
+import { Mail } from 'lucide-react'
+
+<Button type="primary">Primary</Button>
+<Button type="default">Default</Button>
+<Button type="outline">Outline</Button>
+<Button type="ghost">Ghost</Button>
+<Button type="destructive">Delete</Button>
+<Button type="primary" loading>Saving...</Button>
+<Button type="primary" icon={<Mail size={14} />}>With icon</Button>
+<Button type="primary" iconRight={<Mail size={14} />}>Icon right</Button>
+
+// As link
+<Button asChild>
+  <Link href="/login">Login</Link>
+</Button>
+
+// Using buttonVariants for non-button elements
+import { buttonVariants } from 'ui'
+<Link className={buttonVariants({ variant: 'outline' })}>Click here</Link>
+```
+
+Note: `type` prop will likely be renamed to `variant` in future versions.
+
+---
+
+### Calendar
+**Source:** shadcn/ui (react-day-picker)
+Date picker calendar. Used within Popover for date selection.
+
+```tsx
+import { Calendar } from 'ui'
+<Calendar mode="single" selected={date} onSelect={setDate} />
+```
+
+---
+
+### Card
+**Source:** Custom Supabase
+Container surface for grouped content.
+
+```tsx
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 'ui'
+
+<Card>
+  <CardHeader>
+    <CardTitle>Account</CardTitle>
+    <CardDescription>Make changes to your account.</CardDescription>
+  </CardHeader>
+  <CardContent>{/* content */}</CardContent>
+  <CardFooter>
+    <Button>Save changes</Button>
+  </CardFooter>
+</Card>
+```
+
+Theme classes from `defaultTheme.ts`:
+- Base: `border-scale-500 bg-scale-100`
+- Hoverable variant: `hover:border-scale-700`
+
+---
+
+### Carousel
+**Source:** shadcn/ui (embla-carousel)
+Scrollable carousel with navigation buttons.
+
+```tsx
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from 'ui'
+
+<Carousel>
+  <CarouselContent>
+    <CarouselItem>Slide 1</CarouselItem>
+    <CarouselItem>Slide 2</CarouselItem>
+  </CarouselContent>
+  <CarouselPrevious />
+  <CarouselNext />
+</Carousel>
+```
+
+---
+
+### Checkbox
+**Radix:** `@radix-ui/react-checkbox`
+Selection control. Checked state uses brand green. Supports indeterminate.
+
+```tsx
+import { Checkbox_Shadcn_ } from 'ui'
+import { Label_Shadcn_ } from 'ui'
+
+<div className="flex items-center gap-2">
+  <Checkbox_Shadcn_ id="terms" />
+  <Label_Shadcn_ htmlFor="terms">Accept terms and conditions</Label_Shadcn_>
+</div>
+```
+
+---
+
+### Collapsible
+**Radix:** `@radix-ui/react-collapsible`
+Single expandable section. Unlike Accordion, multiple can be open simultaneously.
+Used in sidebars for nav groups.
+
+Animation: height `0` → `var(--radix-collapsible-content-height)`, 0.2s ease-out.
+
+```tsx
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+
+<Collapsible>
+  <CollapsibleTrigger>Database</CollapsibleTrigger>
+  <CollapsibleContent>
+    <NavItem>Tables</NavItem>
+    <NavItem>Views</NavItem>
+  </CollapsibleContent>
+</Collapsible>
+```
+
+---
+
+### Combobox
+**Source:** shadcn/ui (Popover + Command combination)
+Searchable select. Combines Popover trigger with Command search inside.
+
+---
+
+### Command
+**Source:** cmdk
+Command menu primitive. Used within Command Dialog (⌘K palette).
+
+```tsx
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from 'ui'
+
+<Command>
+  <CommandInput placeholder="Search..." />
+  <CommandList>
+    <CommandEmpty>No results found.</CommandEmpty>
+    <CommandGroup heading="Suggestions">
+      <CommandItem>Database</CommandItem>
+      <CommandItem>Auth</CommandItem>
+    </CommandGroup>
+  </CommandList>
+</Command>
+```
+
+---
+
+### Command Menu (cmdk) — Full ⌘K Palette
+**Source:** cmdk + Valtio (state management)
+
+Full-screen command palette. Triggered by `⌘K` / `Ctrl+K`.
+
+Pre-packaged pages:
+- `DocsSearchPage` — Documentation search
+- `DocsAiPage` — AI assistant
+- `ThemeSwitcher` — Switch light/dark/system
+- `Support` — Support access
+- `Changelog` — Product changelog
+
+```tsx
+import { CommandDialog } from 'ui'
+
+export function CommandMenuDemo() {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setOpen((open) => !open)
+      }
+    }
+    document.addEventListener('keydown', down)
+    return () => document.removeEventListener('keydown', down)
+  }, [])
+
+  return (
+    <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Navigation">
+          <CommandItem>Database</CommandItem>
+          <CommandItem>Auth</CommandItem>
+          <CommandItem>Storage</CommandItem>
+          <CommandItem>Edge Functions</CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
+  )
+}
+```
+
+---
+
+### Context Menu
+**Radix:** `@radix-ui/react-context-menu`
+Right-click context menu.
+
+```tsx
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from 'ui'
+
+<ContextMenu>
+  <ContextMenuTrigger>Right click here</ContextMenuTrigger>
+  <ContextMenuContent>
+    <ContextMenuItem>Copy</ContextMenuItem>
+    <ContextMenuItem>Delete</ContextMenuItem>
+  </ContextMenuContent>
+</ContextMenu>
+```
+
+---
+
+### Date Picker
+**Source:** shadcn/ui (Calendar + Popover)
+Popover-triggered calendar for date input.
+
+```tsx
+import { Popover, PopoverContent, PopoverTrigger } from 'ui'
+import { Calendar } from 'ui'
+import { format } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
+
+<Popover>
+  <PopoverTrigger asChild>
+    <Button type="outline" icon={<CalendarIcon size={14} />}>
+      {date ? format(date, 'PPP') : 'Pick a date'}
+    </Button>
+  </PopoverTrigger>
+  <PopoverContent className="w-auto p-0">
+    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+  </PopoverContent>
+</Popover>
+```
+
+---
+
+### Dialog
+**Radix:** `@radix-ui/react-dialog`
+Modal overlay. Supabase extends shadcn's Dialog with:
+- `DialogSection` — padded content area
+- `DialogSectionSeparator` — horizontal rule between header and content
+
+Animation: backdrop fade-in + content scale `0.95→1` + fade-in, 200ms.
+
+```tsx
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogSection, DialogSectionSeparator, DialogTitle, DialogTrigger,
+} from 'ui'
+
+<Dialog>
+  <DialogTrigger asChild>
+    <Button type="default">Open dialog</Button>
+  </DialogTrigger>
+  <DialogContent className="sm:max-w-[425px]">
+    <DialogHeader>
+      <DialogTitle>Edit profile</DialogTitle>
+      <DialogDescription>Make changes to your profile here.</DialogDescription>
+    </DialogHeader>
+    <DialogSectionSeparator />
+    <DialogSection className="space-y-4">
+      <div>
+        <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
+        <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" />
+      </div>
+    </DialogSection>
+    <DialogFooter>
+      <Button>Save changes</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+---
+
+### Drawer
+**Source:** Vaul by emilkowalski_
+Bottom-sheet drawer component for mobile/touch contexts.
+
+```tsx
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from 'ui'
+
+<Drawer>
+  <DrawerTrigger asChild>
+    <Button type="outline">Open drawer</Button>
+  </DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>Settings</DrawerTitle>
+      <DrawerDescription>Adjust your preferences.</DrawerDescription>
+    </DrawerHeader>
+    <DrawerFooter>
+      <Button>Save</Button>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+---
+
+### Dropdown Menu
+**Radix:** `@radix-ui/react-dropdown-menu`
+Contextual action menu triggered by a button. Used for kebab menus, row actions, profile menus.
+Supports sub-menus, separators, keyboard shortcuts.
+
+Animation: fade-in + slide-in 4px from trigger, 150ms ease-out.
+
+```tsx
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuShortcut,
+} from 'ui'
+import { MoreHorizontal } from 'lucide-react'
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button type="ghost" icon={<MoreHorizontal size={14} />} />
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end" className="max-w-48">
+    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Edit</DropdownMenuItem>
+    <DropdownMenuItem>Duplicate</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+---
+
+### Expanding Textarea
+**Source:** Custom Supabase
+Textarea that auto-grows as user types. Used for SQL editor inputs, description fields.
+
+---
+
+### Field
+**Source:** Custom Supabase
+Form field wrapper providing label + control + error message layout with consistent spacing.
+
+---
+
+### Form
+**Source:** shadcn/ui (react-hook-form)
+See UI Patterns — Forms section above for full documentation.
+
+---
+
+### Hover Card
+**Radix:** `@radix-ui/react-hover-card`
+Content that opens when hovering over a trigger. Used for rich previews.
+
+---
+
+### Input
+**Source:** shadcn/ui
+Standard text input field.
+
+```tsx
+import { Input_Shadcn_ } from 'ui'
+
+<Input_Shadcn_ type="email" placeholder="Email" />
+<Input_Shadcn_ type="password" placeholder="Password" />
+<Input_Shadcn_ size="tiny" placeholder="Small input" />
+```
+
+Sizes: `tiny`, `small`, `medium`, `large`, `xlarge`
+States: `standard`, `error`
+Focus ring: brand color transition 150ms ease.
+
+---
+
+### Input OTP
+**Source:** shadcn/ui (input-otp)
+One-time password input with auto-advance between digits.
+
+```tsx
+import { InputOTP, InputOTPGroup, InputOTPSlot } from 'ui'
+
+<InputOTP maxLength={6}>
+  <InputOTPGroup>
+    <InputOTPSlot index={0} />
+    <InputOTPSlot index={1} />
+    <InputOTPSlot index={2} />
+    <InputOTPSlot index={3} />
+    <InputOTPSlot index={4} />
+    <InputOTPSlot index={5} />
+  </InputOTPGroup>
+</InputOTP>
+```
+
+---
+
+### Label
+**Radix:** `@radix-ui/react-label`
+Accessible form label.
+
+```tsx
+import { Label_Shadcn_ } from 'ui'
+<Label_Shadcn_ htmlFor="email">Email address</Label_Shadcn_>
+```
+
+---
+
+### Menubar
+**Radix:** `@radix-ui/react-menubar`
+Horizontal menu bar for application-level navigation (rare in Supabase dashboard, used in SQL editor).
+
+---
+
+### Mermaid
+**Source:** Custom (mermaid.js)
+Renders Mermaid diagrams from markdown syntax.
+Used in documentation rendering contexts.
+
+---
+
+### Nav Menu / Navigation Menu
+**Radix:** `@radix-ui/react-navigation-menu`
+Top-level navigation with mega-menus and hover dropdowns.
+Used on the marketing website (supabase.com/www).
+
+---
+
+### Pagination
+**Source:** shadcn/ui
+Previous/next and page number navigation.
+
+```tsx
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem,
+  PaginationLink, PaginationNext, PaginationPrevious } from 'ui'
+
+<Pagination>
+  <PaginationContent>
+    <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
+    <PaginationItem><PaginationLink href="#">1</PaginationLink></PaginationItem>
+    <PaginationItem><PaginationEllipsis /></PaginationItem>
+    <PaginationItem><PaginationNext href="#" /></PaginationItem>
+  </PaginationContent>
+</Pagination>
+```
+
+---
+
+### Popover
+**Radix:** `@radix-ui/react-popover`
+Floating panel anchored to a trigger. Used for date pickers, inline filters, rich menus.
+Not for navigation (use DropdownMenu).
+
+Animation: fade-in + zoom-in `0.95→1`, 150ms ease-out, slides from anchor direction.
+
+```tsx
+import { Popover, PopoverContent, PopoverTrigger } from 'ui'
+
+<Popover>
+  <PopoverTrigger asChild>
+    <Button type="outline">Open popover</Button>
+  </PopoverTrigger>
+  <PopoverContent className="w-80">
+    <p>Popover content here</p>
+  </PopoverContent>
+</Popover>
+```
+
+---
+
+### Progress
+**Radix:** `@radix-ui/react-progress`
+Progress bar showing completion percentage.
+
+```tsx
+import { Progress } from 'ui'
+<Progress value={60} className="w-full" />
+```
+
+---
+
+### Radio Group
+**Radix:** `@radix-ui/react-radio-group`
+Mutually exclusive selection. Stack vertically by default.
+
+```tsx
+import { RadioGroup, RadioGroupItem } from 'ui'
+import { Label_Shadcn_ } from 'ui'
+
+<RadioGroup defaultValue="comfortable">
+  <div className="flex items-center gap-2">
+    <RadioGroupItem value="default" id="r1" />
+    <Label_Shadcn_ htmlFor="r1">Default</Label_Shadcn_>
+  </div>
+  <div className="flex items-center gap-2">
+    <RadioGroupItem value="comfortable" id="r2" />
+    <Label_Shadcn_ htmlFor="r2">Comfortable</Label_Shadcn_>
+  </div>
+</RadioGroup>
+```
+
+---
+
+### Radio Group Card
+**Source:** Custom Supabase
+Radio selection displayed as a card grid. Used for plan/tier selection.
+
+Variants: `cards`, `stacked-cards`, `small-cards`, `large-cards`
+
+---
+
+### Radio Group Stacked
+**Source:** Custom Supabase
+Stacked radio cards for list-style option selection.
+
+---
+
+### Resizable
+**Source:** shadcn/ui (react-resizable-panels)
+Resizable panel layout. Used in SQL editor (query + results split view).
+
+```tsx
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+
+<ResizablePanelGroup direction="horizontal">
+  <ResizablePanel defaultSize={50}>Left panel</ResizablePanel>
+  <ResizableHandle />
+  <ResizablePanel defaultSize={50}>Right panel</ResizablePanel>
+</ResizablePanelGroup>
+```
+
+---
+
+### Scroll Area
+**Radix:** `@radix-ui/react-scroll-area`
+Custom scrollbar that blends with the theme. Thumb appears on hover.
+
+```tsx
+import { ScrollArea } from 'ui'
+
+<ScrollArea className="h-72 w-48 rounded-md border">
+  <div className="p-4">
+    {items.map((item) => <div key={item}>{item}</div>)}
+  </div>
+</ScrollArea>
+```
+
+---
+
+### Select
+**Radix:** `@radix-ui/react-select`
+Dropdown picker triggered by a button. Supports grouped options and scrollable lists.
+
+```tsx
+import { Select_Shadcn_, SelectContent_Shadcn_, SelectGroup_Shadcn_, SelectItem_Shadcn_,
+  SelectLabel_Shadcn_, SelectTrigger_Shadcn_, SelectValue_Shadcn_ } from 'ui'
+
+<Select_Shadcn_>
+  <SelectTrigger_Shadcn_ className="w-[180px]">
+    <SelectValue_Shadcn_ placeholder="Select a framework" />
+  </SelectTrigger_Shadcn_>
+  <SelectContent_Shadcn_>
+    <SelectGroup_Shadcn_>
+      <SelectLabel_Shadcn_>Frameworks</SelectLabel_Shadcn_>
+      <SelectItem_Shadcn_ value="next">Next.js</SelectItem_Shadcn_>
+      <SelectItem_Shadcn_ value="remix">Remix</SelectItem_Shadcn_>
+      <SelectItem_Shadcn_ value="astro">Astro</SelectItem_Shadcn_>
+    </SelectGroup_Shadcn_>
+  </SelectContent_Shadcn_>
+</Select_Shadcn_>
+```
+
+---
+
+### Separator
+**Radix:** `@radix-ui/react-separator`
+Visual divider between sections.
+
+```tsx
+import { Separator } from 'ui'
+<Separator className="my-4" />
+<Separator orientation="vertical" className="h-4 mx-2" />
+```
+
+---
+
+### Sheet
+**Radix:** `@radix-ui/react-dialog` (side panel variant)
+Extends Dialog to display side panel content. Slides from right by default.
+
+Animation: slide-in `translateX(100%) → 0`, 300ms ease-out.
+
+```tsx
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from 'ui'
+
+<Sheet>
+  <SheetTrigger asChild>
+    <Button type="outline">Open settings</Button>
+  </SheetTrigger>
+  <SheetContent>
+    <SheetHeader>
+      <SheetTitle>Project settings</SheetTitle>
+      <SheetDescription>Make changes to your project settings.</SheetDescription>
+    </SheetHeader>
+    {/* form content */}
+  </SheetContent>
+</Sheet>
+```
+
+Side options: `"top"`, `"right"` (default), `"bottom"`, `"left"`
+
+---
+
+### Sidebar
+**Source:** Custom Supabase (shadcn/ui sidebar pattern)
+Dashboard navigation sidebar. Collapsible on mobile.
+
+Width: 256px expanded, 64px collapsed (icon-only mode).
+Background: `bg-dash-sidebar`
+Item hover: transition 100ms, `bg-surface-100`
+Active item: `bg-surface-200`
+
+Used with `Collapsible` for nested nav groups.
+
+---
+
+### Skeleton
+**Source:** shadcn/ui
+Loading placeholder mirroring real content layout.
+
+Animation: shimmer (linear-gradient sweep), 2s linear infinite.
+
+```tsx
+import { Skeleton } from 'ui'
+
+<div className="flex flex-col gap-3">
+  <Skeleton className="h-4 w-[250px]" />
+  <Skeleton className="h-4 w-[200px]" />
+  <Skeleton className="h-32 w-full rounded-md" />
+</div>
+```
+
+---
+
+### Slider
+**Radix:** `@radix-ui/react-slider`
+Range input. Brand-colored track fill and thumb.
+Thumb scales `1→1.2` on hover/focus, 150ms ease.
+
+```tsx
+import { Slider } from 'ui'
+<Slider defaultValue={[50]} max={100} step={1} className="w-64" />
+```
+
+---
+
+### Sonner (Toast)
+**Source:** sonner
+Notification toasts stacked bottom-right.
+
+Animation: slide-in from bottom + fade-in, 200ms. Swipe to dismiss.
+Auto-dismiss: 4 seconds default.
+
+```tsx
+import { Toaster, toast } from 'sonner'
+
+// In layout root:
+<Toaster position="bottom-right" />
+
+// Trigger:
+toast.success('Project saved!')
+toast.error('Failed to save project')
+toast('Loading...', { description: 'Please wait', duration: Infinity })
+toast.warning('API rate limit approaching')
+```
+
+---
+
+### Switch
+**Radix:** `@radix-ui/react-switch`
+Toggle for binary settings. Brand green when checked.
+
+Animation: thumb translate 200ms spring-like ease; background color 200ms ease.
+
+```tsx
+import { Switch } from 'ui'
+import { Label_Shadcn_ } from 'ui'
+
+<div className="flex items-center gap-2">
+  <Switch id="airplane-mode" />
+  <Label_Shadcn_ htmlFor="airplane-mode">Airplane mode</Label_Shadcn_>
+</div>
+```
+
+---
+
+### Table
+**Source:** shadcn/ui
+Low-level presentational table component. See UI Patterns — Tables for full docs.
+
+```tsx
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableHeadSort } from 'ui'
+```
+
+`TableHeadSort` — sortable column header with 3-state cycling (none → asc → desc → none).
+Sort string format: `"columnId:asc"` or `"columnId:desc"`
+
+---
+
+### Tabs
+**Radix:** `@radix-ui/react-tabs`
+Layered sections shown one at a time. Active indicator slides between tabs.
+
+```tsx
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+
+<Tabs_Shadcn_ defaultValue="account" className="w-full">
+  <TabsList_Shadcn_ className="grid w-full grid-cols-2">
+    <TabsTrigger_Shadcn_ value="account">Account</TabsTrigger_Shadcn_>
+    <TabsTrigger_Shadcn_ value="password">Password</TabsTrigger_Shadcn_>
+  </TabsList_Shadcn_>
+  <TabsContent_Shadcn_ value="account">Account content</TabsContent_Shadcn_>
+  <TabsContent_Shadcn_ value="password">Password content</TabsContent_Shadcn_>
+</Tabs_Shadcn_>
+```
+
+Tab variants (from `defaultTheme.ts`): `underlined`, `pills`, `rounded-pills`
+
+---
+
+### Textarea
+**Source:** shadcn/ui
+Multi-line text input.
+
+```tsx
+import { Textarea } from 'ui'
+<Textarea placeholder="Type your message here." />
+```
+
+---
+
+### Toggle
+**Radix:** `@radix-ui/react-toggle`
+Two-state button (pressed / not pressed).
+
+```tsx
+import { Toggle } from 'ui'
+import { Bold } from 'lucide-react'
+<Toggle aria-label="Toggle bold"><Bold size={14} /></Toggle>
+```
+
+---
+
+### Toggle Group
+**Radix:** `@radix-ui/react-toggle-group`
+Group of Toggle buttons. Supports single and multiple selection.
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from 'ui'
+
+<ToggleGroup type="single" defaultValue="left">
+  <ToggleGroupItem value="left">Left</ToggleGroupItem>
+  <ToggleGroupItem value="center">Center</ToggleGroupItem>
+  <ToggleGroupItem value="right">Right</ToggleGroupItem>
+</ToggleGroup>
+```
+
+---
+
+### Tooltip
+**Radix:** `@radix-ui/react-tooltip`
+Short contextual hints on hover. Delay: 300ms open, 100ms close.
+Never put interactive elements inside.
+
+Animation: fade-in + slide-in from anchor side, 150ms ease-out.
+
+```tsx
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button type="ghost" icon={<Info size={14} />} />
+    </TooltipTrigger>
+    <TooltipContent>This is contextual help</TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+```
+
+---
+
+### Tree View
+**Source:** Custom Supabase
+Hierarchical tree navigation component.
+Used in database schema explorer, file tree views in Storage.
+
+---
+
+## 39. ARCHITECTURE: packages/ui vs packages/ui-patterns
+
+### packages/ui (core primitives)
+- Radix UI wrappers with consistent theming
+- All components exported from single `'ui'` entry point
+- Includes `defaultTheme.ts` (1490 lines) with component-specific Tailwind class definitions
+- Theme configured via `packages/config/ui.config.js`
+
+Radix UI primitive versions (from packages/ui/package.json):
+```
+@radix-ui/react-accordion: ^1.2.12
+@radix-ui/react-alert-dialog: ^1.1.15
+@radix-ui/react-dialog: ^1.1.15
+@radix-ui/react-dropdown-menu: ^2.1.16
+@radix-ui/react-popover: ^1.1.15
+@radix-ui/react-select: ^2.2.6
+@radix-ui/react-tabs: ^1.0.4
+@radix-ui/react-tooltip: ^1.1.6
+@radix-ui/react-checkbox: ^1.0.4
+@radix-ui/react-radio-group: ^1.3.8
+@radix-ui/react-switch: ^1.0.3
+@radix-ui/react-slider: ^1.3.6
+@radix-ui/react-avatar: ^1.0.4
+```
+
+### packages/ui-patterns (complex patterns)
+- 80+ exported components in feature-specific modules
+- Imports from `packages/ui`
+- Explicit export paths for tree-shaking:
+  ```tsx
+  import { MetricCard } from 'ui-patterns/MetricCard'
+  import { ConfirmationModal } from 'ui-patterns/Dialogs'
+  import { FilterBar } from 'ui-patterns/FilterBar'
+  ```
+- State management via Valtio (CommandMenu)
+- SqlToRest converter: `ui-patterns/SqlToRest`
+
+### Consumer App Integration
+All Next.js apps consuming these packages must include them in `transpilePackages`:
+```js
+// next.config.js
+transpilePackages: ['ui', 'ui-patterns', 'icons']
+```
+
+---
+
+## 40. THEME SYSTEM DEEP-DIVE
+
+### CSS Custom Properties Architecture
+
+**Light mode (`:root`):**
+```css
+:root {
+  /* Radix slate scale mapped to Supabase scale */
+  --colors-scale1: hsl(0, 0%, 99%);     /* scale-100 = lightest */
+  --colors-scale2: hsl(240, 5%, 96%);
+  --colors-scale3: hsl(240, 5.9%, 90%);
+  --colors-scale4: hsl(240, 4.9%, 83.9%);
+  --colors-scale5: hsl(240, 5%, 74%);
+  --colors-scale6: hsl(240, 3.8%, 65.1%);
+  --colors-scale7: hsl(240, 4.6%, 48.8%);
+  --colors-scale8: hsl(240, 5.3%, 33.7%);
+  --colors-scale9: hsl(240, 5.9%, 22%);
+  --colors-scale10: hsl(240, 6%, 17%);
+  --colors-scale11: hsl(240, 7.7%, 9%);
+  --colors-scale12: hsl(240, 10%, 3.9%); /* scale-1200 = darkest */
+
+  --colors-brand: hsl(153, 61%, 53%);    /* #3fcf8e */
+  --colors-brand-600: hsl(153, 55%, 45%);
+}
+```
+
+**Dark mode (`[data-theme*='dark']`):**
+```css
+[data-theme*='dark'] {
+  --colors-scale1: hsl(0, 0%, 7%);      /* darkest bg */
+  --colors-scale2: hsl(0, 0%, 9%);
+  --colors-scale3: hsl(0, 0%, 11%);
+  --colors-scale4: hsl(0, 0%, 14%);
+  --colors-scale5: hsl(0, 0%, 17%);
+  --colors-scale6: hsl(0, 0%, 20%);
+  --colors-scale7: hsl(0, 0%, 24%);
+  --colors-scale8: hsl(0, 0%, 31%);
+  --colors-scale9: hsl(0, 0%, 43%);
+  --colors-scale10: hsl(0, 0%, 62%);
+  --colors-scale11: hsl(0, 0%, 78%);
+  --colors-scale12: hsl(0, 0%, 93%);    /* lightest text */
+
+  --colors-brand: hsl(153, 61%, 53%);   /* brand unchanged */
+}
+```
+
+### Component Theme Classes (from defaultTheme.ts)
+
+| Component | Scale classes used |
+|---|---|
+| accordion | `border-scale-500`, `text-scale-1200`, `hover:bg-scale-400` |
+| badge-brand | `bg-brand-200`, `text-brand-1100`, `rounded-full` |
+| alert-danger | `bg-red-200`, `border-red-700`, `text-red-1100` |
+| alert-warning | `bg-amber-200`, `border-amber-700`, `text-amber-1100` |
+| alert-success | `bg-green-200`, `border-green-700`, `text-green-1100` |
+| card base | `border-scale-500`, `bg-scale-100` |
+| card hoverable | `hover:border-scale-700` |
+| tabs-underlined | `border-b-scale-600` |
+| tabs-pills | `bg-scale-400`, `rounded-md` |
+| input-standard | `border-scale-700`, `text-scale-1200`, `focus:border-brand` |
+| button-primary | `bg-brand`, `hover:bg-brand-600` |
+| button-default | `border-scale-600`, `bg-scale-100` |
+| button-danger | `bg-red-900`, `text-red-100` |
+| toggle-off | `bg-scale-500` |
+| toggle-on | `bg-brand` |
+| checkbox-checked | `checked:bg-brand` |
+
+---
+
+## 41. ANIMATION SYSTEM
+
+### Keyframe Animations (from defaultTheme.ts)
+
+| Animation | Trigger | Duration | Easing |
+|---|---|---|---|
+| `accordion-down` | Accordion open | 0.2s | ease-out |
+| `accordion-up` | Accordion close | 0.2s | ease-out |
+| `collapsible-down` | Collapsible open | 0.2s | ease-out |
+| `collapsible-up` | Collapsible close | 0.2s | ease-out |
+| `overlayContentShow` | Dialog/Sheet open | 0.2s | cubic-bezier(0.16,1,0.3,1) |
+| `overlayContentHide` | Dialog/Sheet close | 0.15s | ease-in |
+| `dropdownFadeIn` | Dropdown open | 0.15s | ease-out |
+| `dropdownFadeOut` | Dropdown close | 0.1s | ease-in |
+| `fadeIn` | General fade in | 0.15s | ease-out |
+| `fadeOut` | General fade out | 0.15s | ease-in |
+| `shimmer` | Skeleton loading | 2s | linear infinite |
+
+### Micro-Animation Reference
+
+| Interaction | CSS | Tailwind |
+|---|---|---|
+| Button hover lift | `translateY(-1px)` 100ms | `hover:-translate-y-px transition-transform duration-100` |
+| Button press | `scale(0.98)` 80ms | `active:scale-[0.98]` |
+| Input focus ring | `box-shadow` 150ms | `focus:ring-2 focus:ring-brand transition-shadow duration-150` |
+| Dropdown open | `opacity 0→1 + translateY(-4px)→0` 150ms | `data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95` |
+| Dialog open | `scale(0.95)→1 + opacity` 200ms | `data-[state=open]:animate-in data-[state=open]:zoom-in-95 data-[state=open]:fade-in-0` |
+| Sheet slide in | `translateX(100%)→0` 300ms | `data-[state=open]:animate-in data-[state=open]:slide-in-from-right` |
+| Sidebar item hover | Background 100ms | `transition-colors duration-100 hover:bg-surface-100` |
+| Table row hover | Background 75ms | `transition-colors duration-75 hover:bg-scale-200` |
+| Skeleton shimmer | Gradient sweep 2s | `animate-shimmer bg-gradient-to-r from-scale-200 via-scale-300 to-scale-200` |
+| Toast slide in | `translateY(full)→0` 200ms | `data-[state=open]:slide-in-from-bottom-full data-[state=open]:fade-in-0` |
+
+### Radix Data Attributes for Animations
+```
+data-[state=open]:animate-in
+data-[state=closed]:animate-out
+data-[state=open]:fade-in-0
+data-[state=closed]:fade-out-0
+data-[state=open]:zoom-in-95
+data-[state=closed]:zoom-out-95
+data-[state=open]:slide-in-from-top-2
+data-[state=open]:slide-in-from-bottom-full
+data-[state=open]:slide-in-from-right
+data-[state=closed]:slide-out-to-right
+data-[swipe=end]:animate-out
+```
+
+---
+
+## 42. ICON SYSTEM DEEP-DIVE
+
+### lucide-react (standard UI icons)
+Package: `lucide-react`
+Default: `strokeWidth={2}`, `size={24}`
+
+Common icon → use mapping:
+```
+Database     → database feature, table selector
+Shield       → auth, RLS, security
+HardDrive    → storage feature
+Zap          → edge functions
+Radio        → realtime
+Settings     → settings/configuration
+MoreHorizontal → row kebab menu, overflow
+Plus         → create/add action
+Trash2       → delete action
+Edit2        → edit action
+Copy         → copy to clipboard
+Check        → success state
+X            → close/dismiss
+AlertCircle  → error state
+AlertTriangle → warning state
+Info         → informational tooltip
+ExternalLink → opens in new tab
+Search       → search input
+Key          → API keys, credentials
+Lock         → RLS, access control
+Code2        → API, code blocks
+Globe2       → public/internet
+User         → user accounts
+ChevronDown  → expand/collapse
+ChevronRight → navigate to / sidebar item
+```
+
+### Custom Icons (packages/icons)
+Built from SVG files in `packages/icons/src/raw-icons/`.
+Build command: `npm run build:icons` from `packages/icons/`.
+Name convention: kebab-case SVG → PascalCase component.
+
+```tsx
+import { Database, Auth, EdgeFunctions, Storage, Realtime, SqlEditor,
+         TableEditor, Logs, Settings, ApiDocs, Integrations, Home,
+         User, Postgres, Graphql, BucketPlus, InsertCode, ReplaceCode } from 'icons'
+```
+
+SVG requirements:
+- 24×24px viewBox
+- `stroke="currentColor"` (NO hardcoded colors)
+- `stroke-width="1.5"`
+- `fill="none"`
+- Simple `<path>` elements only
+- Content ~18×18px within 24×24 frame
+
+---
+
+## 43. DATA PACKAGE & TOKEN PIPELINE
+
+### Token Flow
+```
+Figma Design Tokens
+      ↓
+Export as JSON (packages/ui/internals/tokens/*.json)
+      ↓
+Build scripts (packages/ui/internals/tokens/build.ts)
+      ↓
+CSS custom properties (--colors-scale1, --background-default, etc.)
+      ↓
+Tailwind config (packages/config/ui.config.js)
+      ↓
+Tailwind utility classes (text-foreground, bg-surface-100, border-strong, etc.)
+      ↓
+Components (packages/ui)
+      ↓
+Fragment patterns (packages/ui-patterns)
+      ↓
+Apps (studio, docs, www, design-system)
+```
+
+### Next.js Integration
+```js
+// next.config.js / next.config.mjs
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  transpilePackages: ['ui', 'ui-patterns', 'icons'],
+}
+```
+
+### shadcn/ui Initialization
+Supabase uses shadcn as its base layer. To initialize:
+```bash
+npx shadcn-ui@latest init
+```
+
+Add individual components:
+```bash
+npx shadcn-ui@latest add accordion alert badge button dialog input select tabs
+npx shadcn-ui@latest add tooltip switch slider avatar checkbox radio-group popover
+npx shadcn-ui@latest add dropdown-menu alert-dialog sheet skeleton scroll-area
+npx shadcn-ui@latest add collapsible command sonner separator progress
+```
+
+### External Libraries Used
+```
+@tanstack/react-table    → Data Table pattern
+recharts                 → Charts pattern
+cmdk                     → Command Menu
+react-day-picker         → Calendar, Date Picker
+vaul                     → Drawer
+sonner                   → Toast notifications
+react-hook-form          → All forms
+zod                      → Form validation
+@hookform/resolvers      → Connects zod to react-hook-form
+valtio                   → CommandMenu state management
+react-data-grid          → Data Grid (heavy spreadsheet tables)
+react-markdown           → Markdown rendering
+mermaid                  → Diagram rendering
+embla-carousel           → Carousel
+react-resizable-panels   → Resizable panels (SQL editor)
+input-otp                → OTP input
+```
+
+---
+
+## APPENDIX: FULL URL INDEX
+
+All pages at https://supabase.com/design-system:
+
+### Getting Started
+- /design-system (home)
+- /design-system/docs (introduction)
+- /design-system/docs/accessibility
+- /design-system/docs/color-usage
+- /design-system/docs/copywriting
+- /design-system/docs/icons
+- /design-system/docs/tailwind-classes
+- /design-system/docs/theming
+- /design-system/docs/typography
+
+### UI Patterns
+- /design-system/docs/ui-patterns/introduction
+- /design-system/docs/ui-patterns/charts
+- /design-system/docs/ui-patterns/empty-states
+- /design-system/docs/ui-patterns/forms
+- /design-system/docs/ui-patterns/layout
+- /design-system/docs/ui-patterns/modality
+- /design-system/docs/ui-patterns/navigation
+- /design-system/docs/ui-patterns/tables
+
+### Fragment Components
+- /design-system/docs/fragments/introduction
+- /design-system/docs/fragments/admonition
+- /design-system/docs/fragments/assistant-chat
+- /design-system/docs/fragments/confirmation-modal
+- /design-system/docs/fragments/data-input
+- /design-system/docs/fragments/empty-state-presentational
+- /design-system/docs/fragments/filter-bar
+- /design-system/docs/fragments/form-item-layout
+- /design-system/docs/fragments/info-tooltip
+- /design-system/docs/fragments/inner-side-menu
+- /design-system/docs/fragments/logs-bar-chart
+- /design-system/docs/fragments/metric-card
+- /design-system/docs/fragments/modal
+- /design-system/docs/fragments/multi-select
+- /design-system/docs/fragments/page-container
+- /design-system/docs/fragments/page-header
+- /design-system/docs/fragments/page-section
+- /design-system/docs/fragments/toc
+- /design-system/docs/fragments/text-confirm-dialog
+
+### Atom Components (57 total)
+- /design-system/docs/components/introduction
+- /design-system/docs/components/accordion
+- /design-system/docs/components/alert
+- /design-system/docs/components/alert-dialog
+- /design-system/docs/components/aspect-ratio
+- /design-system/docs/components/avatar
+- /design-system/docs/components/badge
+- /design-system/docs/components/breadcrumb
+- /design-system/docs/components/button
+- /design-system/docs/components/calendar
+- /design-system/docs/components/card
+- /design-system/docs/components/carousel
+- /design-system/docs/components/checkbox
+- /design-system/docs/components/collapsible
+- /design-system/docs/components/combobox
+- /design-system/docs/components/command
+- /design-system/docs/components/commandmenu
+- /design-system/docs/components/context-menu
+- /design-system/docs/components/date-picker
+- /design-system/docs/components/dialog
+- /design-system/docs/components/drawer
+- /design-system/docs/components/dropdown-menu
+- /design-system/docs/components/expanding-textarea
+- /design-system/docs/components/field
+- /design-system/docs/components/form
+- /design-system/docs/components/hover-card
+- /design-system/docs/components/input
+- /design-system/docs/components/input-otp
+- /design-system/docs/components/label
+- /design-system/docs/components/menubar
+- /design-system/docs/components/mermaid
+- /design-system/docs/components/nav-menu
+- /design-system/docs/components/navigation-menu
+- /design-system/docs/components/pagination
+- /design-system/docs/components/popover
+- /design-system/docs/components/progress
+- /design-system/docs/components/radio-group
+- /design-system/docs/components/radio-group-card
+- /design-system/docs/components/radio-group-stacked
+- /design-system/docs/components/resizable
+- /design-system/docs/components/scroll-area
+- /design-system/docs/components/select
+- /design-system/docs/components/separator
+- /design-system/docs/components/sheet
+- /design-system/docs/components/sidebar
+- /design-system/docs/components/skeleton
+- /design-system/docs/components/slider
+- /design-system/docs/components/sonner
+- /design-system/docs/components/switch
+- /design-system/docs/components/table
+- /design-system/docs/components/tabs
+- /design-system/docs/components/textarea
+- /design-system/docs/components/toggle
+- /design-system/docs/components/toggle-group
+- /design-system/docs/components/tooltip
+- /design-system/docs/components/tree-view
+
+---
+# END OF DOCUMENT
+# Total coverage: 9 getting-started pages + 8 UI pattern pages + 19 fragment pages + 57 atom component pages
+# Source verified against: supabase.com/design-system + supabase-design-system.vercel.app
