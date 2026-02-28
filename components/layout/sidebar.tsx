@@ -29,6 +29,13 @@ import {
 } from "lucide-react"
 import { useConnectionStore } from "@/lib/store"
 import { useState, useEffect } from "react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 // Navigation structure following Supabase specifications
 interface NavItem {
@@ -106,7 +113,7 @@ const settingsItem: NavItem = {
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { getActive } = useConnectionStore()
+  const { getActive, connections, setActive } = useConnectionStore()
   const activeConnection = getActive()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
@@ -154,7 +161,10 @@ export function Sidebar() {
       return (
         <div key={item.title}>
           <button
-            onClick={() => toggleGroup(item.title)}
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleGroup(item.title)
+            }}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
               "text-[#a0a0a0] hover:text-white hover:bg-[#252525]",
@@ -194,8 +204,8 @@ export function Sidebar() {
           collapsed && "justify-center px-0"
         )}
         style={{
-          paddingLeft: collapsed ? '14px' : `${12 + level * 16}px`,
-          paddingRight: collapsed ? '14px' : '12px',
+          paddingLeft: collapsed ? '0px' : `${12 + level * 16}px`,
+          paddingRight: collapsed ? '0px' : '12px',
           height: '40px',
         }}
       >
@@ -203,7 +213,10 @@ export function Sidebar() {
         {itemActive && (
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-[24px] bg-accent-green" />
         )}
-        <item.icon className="h-5 w-5 flex-shrink-0" />
+        <item.icon className={cn(
+          "h-5 w-5 flex-shrink-0",
+          collapsed && "mx-auto"
+        )} />
         {!collapsed && <span className="truncate text-sm">{item.title}</span>}
       </Link>
     )
@@ -234,6 +247,7 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
+        onClick={() => !mobileMenuOpen && setCollapsed(!collapsed)}
         className={cn(
           "fixed lg:static inset-y-0 left-0 z-40",
           "flex flex-col",
@@ -241,7 +255,8 @@ export function Sidebar() {
           "transition-all duration-200 ease-in-out",
           "lg:translate-x-0",
           collapsed ? "w-16" : "w-[280px]",
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          "cursor-pointer"
         )}
       >
         {/* Logo Section - Height 56px */}
@@ -257,17 +272,22 @@ export function Sidebar() {
               <span className="font-semibold text-lg text-white">BetterBase</span>
             )}
           </Link>
-          {/* Collapse toggle button */}
+          {/* Collapse toggle button - styled blue like settings button */}
           <button
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={(e) => {
+              e.stopPropagation()
+              setCollapsed(!collapsed)
+            }}
             className={cn(
-              "hidden lg:flex items-center justify-center p-1 rounded hover:bg-[#252525] transition-colors ml-auto",
-              collapsed && "absolute -right-3 top-6 bg-[#2d2d2d] border border-[#333333]"
+              "hidden lg:flex items-center justify-center p-1.5 rounded-md transition-colors ml-auto",
+              collapsed 
+                ? "absolute -right-3 top-6 bg-blue-600 hover:bg-blue-700 shadow-md" 
+                : "bg-blue-600 hover:bg-blue-700"
             )}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <ChevronLeft className={cn(
-              "h-4 w-4 text-[#a0a0a0] transition-transform",
+              "h-4 w-4 text-white transition-transform",
               collapsed && "rotate-180"
             )} />
           </button>
@@ -276,17 +296,52 @@ export function Sidebar() {
         {/* Project Switcher */}
         {!collapsed && activeConnection && (
           <div className="border-b border-[#333333] p-3">
-            <button className="w-full flex items-center justify-between rounded-md bg-[#2d2d2d] hover:bg-[#363636] px-3 py-2 transition-colors">
-              <div className="flex flex-col items-start min-w-0">
-                <span className="text-sm font-medium text-white truncate w-full">
-                  {activeConnection.name}
-                </span>
-                <span className="text-xs text-[#a0a0a0] truncate w-full">
-                  {activeConnection.url}
-                </span>
-              </div>
-              <ChevronDown className="h-4 w-4 text-[#a0a0a0] flex-shrink-0 ml-2" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-full flex items-center justify-between rounded-md bg-[#2d2d2d] hover:bg-[#363636] px-3 py-2 transition-colors">
+                  <div className="flex flex-col items-start min-w-0">
+                    <span className="text-sm font-medium text-white truncate w-full">
+                      {activeConnection.name}
+                    </span>
+                    <span className="text-xs text-[#a0a0a0] truncate w-full">
+                      {activeConnection.url}
+                    </span>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-[#a0a0a0] flex-shrink-0 ml-2" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[248px]" align="start" sideOffset={4}>
+                <div className="px-2 py-1.5 text-xs font-semibold text-[#a0a0a0]">
+                  Available Projects
+                </div>
+                {connections.map((connection) => (
+                  <DropdownMenuItem
+                    key={connection.id}
+                    onClick={() => setActive(connection.id)}
+                    className={cn(
+                      "flex flex-col items-start cursor-pointer",
+                      connection.id === activeConnection?.id && "bg-[#404040]"
+                    )}
+                  >
+                    <span className="text-sm font-medium text-white">
+                      {connection.name}
+                    </span>
+                    <span className="text-xs text-[#a0a0a0]">
+                      {connection.url}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/connect"
+                    className="w-full cursor-pointer text-sm text-[#a0a0a0] hover:text-white"
+                  >
+                    Add New Project
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
 
@@ -318,16 +373,6 @@ export function Sidebar() {
         )}>
           {/* Settings Nav Item */}
           {renderNavItem(settingsItem)}
-          
-          {!collapsed && (
-            <Link
-              href="/connect"
-              className="flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium text-[#a0a0a0] transition-colors hover:bg-[#252525] hover:text-white"
-            >
-              <LogOut className="h-5 w-5 flex-shrink-0" />
-              <span>Switch Project</span>
-            </Link>
-          )}
         </div>
       </aside>
     </>
