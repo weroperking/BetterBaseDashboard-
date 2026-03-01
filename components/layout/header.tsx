@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState, useEffect, useRef, useCallback } from "react"
+import { ReactNode, useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -125,6 +125,60 @@ interface SearchResult {
 }
 
 /**
+ * Priority keywords mapping for direct page navigation
+ * When user types these exact terms, show the corresponding page as first result
+ */
+const PRIORITY_KEYWORDS: Record<string, { title: string; href: string; type: SearchResultType }> = {
+  settings: { title: 'Settings', href: '/dashboard/settings', type: 'settings' },
+  logs: { title: 'Logs', href: '/dashboard/logs', type: 'logs' },
+  database: { title: 'Tables', href: '/dashboard/tables', type: 'table' },
+  tables: { title: 'Tables', href: '/dashboard/tables', type: 'table' },
+}
+
+/**
+ * Calculate search score for a search result
+ * Higher scores indicate higher relevance
+ */
+const calculateSearchScore = (item: SearchResult, query: string): number => {
+  const titleLower = item.title.toLowerCase()
+  const descLower = item.description.toLowerCase()
+  const queryLower = query.toLowerCase()
+
+  let score = 0
+
+  // Exact match in title (score: 10)
+  if (titleLower === queryLower) {
+    score += 10
+  }
+  // Starts with query in title (score: 8)
+  else if (titleLower.startsWith(queryLower)) {
+    score += 8
+  }
+  // Contains query in title (score: 6)
+  else if (titleLower.includes(queryLower)) {
+    score += 6
+  }
+
+  // Exact match in description (score: 4)
+  if (descLower === queryLower) {
+    score += 4
+  }
+  // Contains query in description (score: 2)
+  else if (descLower.includes(queryLower)) {
+    score += 2
+  }
+
+  return score
+}
+
+/**
+ * Search results with score for sorting
+ */
+interface SearchResultWithScore extends SearchResult {
+  score: number
+}
+
+/**
  * Mock search data - In a real app, this would come from the API
  * This provides searchable items across the dashboard
  */
@@ -220,32 +274,58 @@ export function DashboardHeader() {
   const activeConnection = getActive()
   
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const searchContainerRef = useRef<HTMLDivElement>(null)
 
-  // Filter search results based on query
-  useEffect(() => {
+  // Pre-compute searchable items once with useMemo
+  const searchableItems = useMemo(() => getSearchableItems(), [])
+
+  // Check for direct navigation keywords
+  const directNavigationResult = useMemo((): SearchResult | null => {
+    const queryLower = searchQuery.toLowerCase().trim()
+    const directMatch = PRIORITY_KEYWORDS[queryLower]
+    if (directMatch) {
+      return {
+        id: `direct-${directMatch.href}`,
+        title: directMatch.title,
+        description: `Navigate to ${directMatch.title}`,
+        type: directMatch.type,
+        href: directMatch.href,
+      }
+    }
+    return null
+  }, [searchQuery])
+
+  // Filter and score search results based on query
+  const searchResults = useMemo((): SearchResult[] => {
     if (!searchQuery.trim()) {
-      setSearchResults([])
-      return
+      return []
     }
 
-    setIsLoading(true)
     const query = searchQuery.toLowerCase()
-    const allItems = getSearchableItems()
-    
-    // Filter items that match the query
-    const filtered = allItems.filter(item => 
-      item.title.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query)
-    ).slice(0, 10) // Limit to 10 results
+    const allItems = searchableItems
 
-    setSearchResults(filtered)
-    setIsLoading(false)
-  }, [searchQuery])
+    // Score all items and filter those with score > 0
+    const scoredResults = allItems
+      .map(item => ({
+        ...item,
+        score: calculateSearchScore(item, query),
+      }))
+      .filter(item => item.score > 0)
+      // Sort by score descending
+      .sort((a, b) => b.score - a.score)
+      // Limit to 10 results
+      .slice(0, 10)
+      .map(({ score, ...item }) => item)
+
+    // If there's a direct navigation result, prepend it to results
+    if (directNavigationResult) {
+      return [directNavigationResult, ...scoredResults.filter(r => r.id !== directNavigationResult.id)]
+    }
+
+    return scoredResults
+  }, [searchQuery, searchableItems, directNavigationResult])
 
   // Handle Ctrl+K (or Cmd+K on Mac) keyboard shortcut
   useEffect(() => {
@@ -294,7 +374,6 @@ export function DashboardHeader() {
 
   const clearSearch = () => {
     setSearchQuery('')
-    setSearchResults([])
     searchInputRef.current?.focus()
   }
 
@@ -332,9 +411,7 @@ export function DashboardHeader() {
         {/* Search Results Dropdown */}
         {isSearchOpen && searchQuery && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-[#2e2e2e] border border-[#444444] rounded-lg shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto">
-            {isLoading ? (
-              <div className="p-4 text-center text-[#a0a0a0] text-sm">Searching...</div>
-            ) : searchResults.length > 0 ? (
+            {searchResults.length > 0 ? (
               <div className="py-2">
                 <div className="px-3 py-1.5 text-xs text-[#666666] font-medium uppercase tracking-wide">
                   Results

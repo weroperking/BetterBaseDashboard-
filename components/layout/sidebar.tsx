@@ -170,7 +170,11 @@ export function Sidebar() {
               "text-[#a0a0a0] hover:text-white hover:bg-[#252525]",
               hasActiveChild && "text-white"
             )}
-            style={{ paddingLeft: `${12 + level * 16}px` }}
+            style={{ 
+              paddingLeft: `${12 + level * 16}px`,
+              paddingRight: '12px',
+              height: '40px'
+            }}
           >
             <item.icon className="h-5 w-5 flex-shrink-0" />
             {!collapsed && (
@@ -262,9 +266,9 @@ export function Sidebar() {
         {/* Logo Section - Height 56px */}
         <div className={cn(
           "flex items-center border-b border-[#333333]",
-          collapsed ? "justify-center px-2" : "px-4"
+          collapsed ? "justify-center px-2 py-[14px]" : "px-4 py-[14px]"
         )}>
-          <Link href="/dashboard" className="flex items-center gap-3 py-[14px]">
+          <Link href="/dashboard" className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-green">
               <LayoutGrid className="h-5 w-5 text-black" />
             </div>
@@ -272,78 +276,7 @@ export function Sidebar() {
               <span className="font-semibold text-lg text-white">BetterBase</span>
             )}
           </Link>
-          {/* Collapse toggle button - styled blue like settings button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setCollapsed(!collapsed)
-            }}
-            className={cn(
-              "hidden lg:flex items-center justify-center p-1.5 rounded-md transition-colors ml-auto",
-              collapsed 
-                ? "absolute -right-3 top-6 bg-blue-600 hover:bg-blue-700 shadow-md" 
-                : "bg-blue-600 hover:bg-blue-700"
-            )}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <ChevronLeft className={cn(
-              "h-4 w-4 text-white transition-transform",
-              collapsed && "rotate-180"
-            )} />
-          </button>
         </div>
-
-        {/* Project Switcher */}
-        {!collapsed && activeConnection && (
-          <div className="border-b border-[#333333] p-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="w-full flex items-center justify-between rounded-md bg-[#2d2d2d] hover:bg-[#363636] px-3 py-2 transition-colors">
-                  <div className="flex flex-col items-start min-w-0">
-                    <span className="text-sm font-medium text-white truncate w-full">
-                      {activeConnection.name}
-                    </span>
-                    <span className="text-xs text-[#a0a0a0] truncate w-full">
-                      {activeConnection.url}
-                    </span>
-                  </div>
-                  <ChevronDown className="h-4 w-4 text-[#a0a0a0] flex-shrink-0 ml-2" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[248px]" align="start" sideOffset={4}>
-                <div className="px-2 py-1.5 text-xs font-semibold text-[#a0a0a0]">
-                  Available Projects
-                </div>
-                {connections.map((connection) => (
-                  <DropdownMenuItem
-                    key={connection.id}
-                    onClick={() => setActive(connection.id)}
-                    className={cn(
-                      "flex flex-col items-start cursor-pointer",
-                      connection.id === activeConnection?.id && "bg-[#404040]"
-                    )}
-                  >
-                    <span className="text-sm font-medium text-white">
-                      {connection.name}
-                    </span>
-                    <span className="text-xs text-[#a0a0a0]">
-                      {connection.url}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/connect"
-                    className="w-full cursor-pointer text-sm text-[#a0a0a0] hover:text-white"
-                  >
-                    Add New Project
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
 
         {/* Collapsed project indicator */}
         {collapsed && activeConnection && (
